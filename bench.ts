@@ -17,6 +17,11 @@ const envFrameworks = process.env.FRAMEWORKS?.split(',').filter(Boolean) || []
 const targetFrameworks =
 	cliFrameworks.length > 0 ? cliFrameworks : envFrameworks
 
+console.log('CLI args:', Bun.argv)
+console.log('CLI frameworks:', cliFrameworks)
+console.log('ENV frameworks:', envFrameworks)
+console.log('Target frameworks:', targetFrameworks)
+
 const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 
 // ? Not working
@@ -81,17 +86,24 @@ const retryFetch = (
 
 const test = async () => {
 	try {
+		console.log('   Testing GET /')
 		const index = await retryFetch('http://127.0.0.1:3000/')
 
-		if ((await index.text()) !== 'Hi')
-			throw new Error('Index: Result not match')
+		const indexText = await index.text()
+		console.log(`   Response: "${indexText}"`)
+		if (indexText !== 'Hi')
+			throw new Error(`Index: Result not match (expected "Hi", got "${indexText}")`)
 
 		if (!index.headers.get('Content-Type')?.includes('text/plain'))
 			throw new Error('Index: Content-Type not match')
 
+		console.log('   Testing GET /id/1?name=bun')
 		const query = await retryFetch('http://127.0.0.1:3000/id/1?name=bun')
-		if ((await query.text()) !== '1 bun')
-			throw new Error('Query: Result not match')
+
+		const queryText = await query.text()
+		console.log(`   Response: "${queryText}"`)
+		if (queryText !== '1 bun')
+			throw new Error(`Query: Result not match (expected "1 bun", got "${queryText}")`)
 
 		if (!query.headers.get('Content-Type')?.includes('text/plain'))
 			throw new Error('Query: Content-Type not match')
@@ -99,6 +111,7 @@ const test = async () => {
 		if (!query.headers.get('X-Powered-By')?.includes('benchmark'))
 			throw new Error('Query: X-Powered-By not match')
 
+		console.log('   Testing POST /json')
 		const body = await retryFetch('http://127.0.0.1:3000/json', {
 			method: 'POST',
 			headers: {
@@ -109,11 +122,16 @@ const test = async () => {
 			})
 		})
 
-		if ((await body.text()) !== JSON.stringify({ hello: 'world' }))
-			throw new Error('Body: Result not match')
+		const bodyText = await body.text()
+		console.log(`   Response: "${bodyText}"`)
+		const expectedBody = JSON.stringify({ hello: 'world' })
+		if (bodyText !== expectedBody)
+			throw new Error(`Body: Result not match (expected "${expectedBody}", got "${bodyText}")`)
 
 		if (!body.headers.get('Content-Type')?.includes('application/json'))
 			throw new Error('Body: Content-Type not match')
+
+		console.log('   All tests passed!')
 	} catch (error) {
 		throw error
 	}
