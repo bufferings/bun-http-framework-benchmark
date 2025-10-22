@@ -316,49 +316,79 @@ const main = async () => {
 
 		await kill()
 	}
+
+	// Ensure results are written to disk
+	await result.flush()
+	console.log('\nBenchmark complete!')
 }
 
 const toNumber = (a: string) => +a.replaceAll(',', '')
 
 const arrange = () => {
-	const table = readFileSync('results/results.md', {
-		encoding: 'utf-8'
-	})
+	console.log('\nArranging results...')
 
-	const orders = []
-
-	const [title, divider, ...rows] = table.split('\n')
-	for (const row of rows) {
-		const data = row
-			.replace(/\ /g, '')
-			.split('|')
-			.filter((a) => a)
-
-		if (data.length !== commands.length + 3) continue
-
-		const [name, runtime, total] = data
-		orders.push({
-			name,
-			runtime,
-			total: toNumber(total),
-			row
+	try {
+		const table = readFileSync('results/results.md', {
+			encoding: 'utf-8'
 		})
+
+		console.log(`Read results.md (${table.length} bytes)`)
+
+		const orders = []
+
+		const [title, divider, ...rows] = table.split('\n')
+		console.log(`Found ${rows.length} result rows`)
+
+		for (const row of rows) {
+			const data = row
+				.replace(/\ /g, '')
+				.split('|')
+				.filter((a) => a)
+
+			if (data.length !== commands.length + 3) continue
+
+			const [name, runtime, total] = data
+			orders.push({
+				name,
+				runtime,
+				total: toNumber(total),
+				row
+			})
+		}
+
+		console.log(`Parsed ${orders.length} valid results`)
+
+		const content = [
+			title,
+			divider,
+			...orders.sort((a, b) => b.total - a.total).map((a) => a.row)
+		].join('\n')
+
+		console.log('\nFinal results:')
+		console.log(content)
+		writeFileSync('results/results.md', content)
+		console.log('\nResults written successfully')
+
+		process.exit(0)
+	} catch (error) {
+		console.error('\nError in arrange():', error)
+		console.error('Skipping arrange step - results.md should still be available')
+		// Don't fail the process if arrange fails
+		process.exit(0)
 	}
-
-	const content = [
-		title,
-		divider,
-		...orders.sort((a, b) => b.total - a.total).map((a) => a.row)
-	].join('\n')
-
-	console.log(content)
-	writeFileSync('results/results.md', content)
-
-	process.exit(0)
 }
 
 process.on('beforeExit', async () => {
 	await killPort(3000)
 })
 
-main().then(arrange)
+main()
+	.then(() => {
+		console.log('Main completed successfully')
+		arrange()
+	})
+	.catch((error) => {
+		console.error('\nError in main():', error)
+		console.error('Stack:', error.stack)
+		process.exit(1)
+	})

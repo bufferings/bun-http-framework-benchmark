@@ -51,23 +51,35 @@ console.log(`Found ${artifacts.length} artifact directories`)
 // Process each artifact
 for (const artifactDir of artifacts) {
 	const artifactPath = join(artifactsDir, artifactDir)
-	const resultsFile = join(artifactPath, 'results', 'results.md')
+	const resultsFile = join(artifactPath, 'results.md')
+
+	console.log(`Processing ${artifactDir}...`)
+	console.log(`Looking for: ${resultsFile}`)
 
 	if (!existsSync(resultsFile)) {
 		console.warn(`No results.md found in ${artifactDir}`)
+		// List what's actually in the artifact directory
+		try {
+			const contents = readdirSync(artifactPath)
+			console.warn(`Contents: ${contents.join(', ')}`)
+		} catch (error) {
+			console.warn(`Could not read directory: ${error}`)
+		}
 		continue
 	}
 
 	// Copy runtime-specific result files
-	const runtimeDirs = readdirSync(join(artifactPath, 'results')).filter(
+	const runtimeDirs = readdirSync(artifactPath).filter(
 		(item) => {
 			try {
-				return lstatSync(join(artifactPath, 'results', item)).isDirectory()
+				return lstatSync(join(artifactPath, item)).isDirectory()
 			} catch {
 				return false
 			}
 		}
 	)
+
+	console.log(`Found runtime directories: ${runtimeDirs.join(', ')}`)
 
 	for (const runtime of runtimeDirs) {
 		runtimes.add(runtime)
@@ -77,13 +89,14 @@ for (const artifactDir of artifacts) {
 			mkdirSync(targetDir, { recursive: true })
 		}
 
-		const files = readdirSync(join(artifactPath, 'results', runtime))
+		const files = readdirSync(join(artifactPath, runtime))
 		for (const file of files) {
-			const sourcePath = join(artifactPath, 'results', runtime, file)
+			const sourcePath = join(artifactPath, runtime, file)
 			const targetPath = join(targetDir, file)
 
 			try {
 				copyFileSync(sourcePath, targetPath)
+				console.log(`Copied ${runtime}/${file}`)
 			} catch (error) {
 				console.warn(`Failed to copy ${sourcePath}: ${error}`)
 			}
