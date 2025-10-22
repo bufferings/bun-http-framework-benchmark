@@ -143,7 +143,7 @@ results.sort((a, b) => b.total - a.total)
 // Generate final results.md
 const header = `
 | Runtime | Framework        |    Average |       Ping |      Query |       Body |
-| ------- | ---------------- | ---------- | ---------- | ---------- | ---------- |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
 `
 
 const content = header + results.map((r) => r.row).join('\n') + '\n'
