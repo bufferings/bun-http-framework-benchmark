@@ -17,6 +17,12 @@ const envFrameworks = process.env.FRAMEWORKS?.split(',').filter(Boolean) || []
 const targetFrameworks =
 	cliFrameworks.length > 0 ? cliFrameworks : envFrameworks
 
+console.error('>>>>>> BENCH.TS STARTING <<<<<<')
+console.error('CLI args:', Bun.argv)
+console.error('CLI frameworks:', cliFrameworks)
+console.error('ENV frameworks:', envFrameworks)
+console.error('Target frameworks:', targetFrameworks)
+console.log('>>>>>> BENCH.TS STARTING <<<<<<')
 console.log('CLI args:', Bun.argv)
 console.log('CLI frameworks:', cliFrameworks)
 console.log('ENV frameworks:', envFrameworks)
@@ -63,24 +69,27 @@ const retryFetch = (
 	return new Promise<Response>((resolve, reject) => {
 		const controller = new AbortController()
 		const timeout = setTimeout(() => {
+			console.log(`   ⏱ Request timeout after 5s (attempt ${time})`)
 			controller.abort()
 		}, 5000) // 5 second timeout per request
 
 		fetch(url, { ...options, signal: controller.signal })
 			.then((a) => {
 				clearTimeout(timeout)
-				if (time > 0) console.log(`   ✓ Connected after ${time} retries`)
-				if (resolveEnd) resolveEnd(a)
+				if (time > 0) process.stdout.write(`   ✓ Connected after ${time} retries\n`)
 
-				resolve(a)
+				// Use resolveEnd if provided (recursive call), otherwise use resolve (first call)
+				const resolveFunc = resolveEnd || resolve
+				resolveFunc(a)
+				process.stdout.write(`   [retryFetch] Promise resolved (time=${time})\n`)
 			})
 			.catch((e) => {
 				clearTimeout(timeout)
 				if (time > 20) {
 					console.log(`   ✗ Failed to connect after ${time} retries: ${e.message}`)
-					if (rejectEnd) rejectEnd(e)
-
-					return reject(e)
+					const rejectFunc = rejectEnd || reject
+					rejectFunc(e)
+					return
 				}
 				if (time % 5 === 0) console.log(`   ... retrying (${time}/20)`)
 				setTimeout(
@@ -92,11 +101,11 @@ const retryFetch = (
 }
 
 const test = async () => {
-	console.log('   [test] Starting test function...')
+	process.stdout.write('   [test] Starting test function...\n')
 	try {
-		console.log('   [test] Testing GET /')
+		process.stdout.write('   [test] Testing GET /\n')
 		const index = await retryFetch('http://127.0.0.1:3000/')
-		console.log('   [test] GET / completed, reading response...')
+		process.stdout.write('   [test] GET / completed, reading response...\n')
 
 		const indexText = await index.text()
 		console.log(`   Response: "${indexText}"`)
@@ -196,6 +205,14 @@ const resultFile = Bun.file('results/results.md')
 const result = resultFile.writer()
 
 const main = async () => {
+	const header = '='.repeat(60)
+	console.log(header)
+	console.error(header)
+	console.log('BENCHMARK STARTING')
+	console.error('BENCHMARK STARTING')
+	console.log(header)
+	console.error(header)
+
 	try {
 		await fetch('http://127.0.0.1:3000')
 		await killPort(3000)
