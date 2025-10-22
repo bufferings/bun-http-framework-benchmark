@@ -168,4 +168,6 @@ dist
 .yarn/install-state.gz
 .pnp.\*
 
-# results
+# Benchmark results
+results/
+artifacts/

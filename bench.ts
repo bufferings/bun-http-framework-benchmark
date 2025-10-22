@@ -8,44 +8,26 @@ import {
 } from 'fs'
 import killPort from 'kill-port'
 import { $, pathToFileURL } from 'bun'
+import { formatFrameworkWithVersion } from './scripts/get-versions'
 
-const whitelists = <string[]>[]
+// Get target framework from CLI args: bun bench.ts framework1 framework2
+// Or from environment variable: FRAMEWORKS=framework1,framework2
+const cliFrameworks = Bun.argv.slice(2).filter((arg) => !arg.startsWith('-'))
+const envFrameworks = process.env.FRAMEWORKS?.split(',').filter(Boolean) || []
+const targetFrameworks =
+	cliFrameworks.length > 0 ? cliFrameworks : envFrameworks
+
+const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 
 // ? Not working
-const blacklists = [
-	// Not booting up in test
-	'node/adonis/index',
-	// Not setting content-type header for some reason
-	'node/nest/index',
-	// 'Not booting up in test'
-	'node/hapi',
-	// Body: Result not match
-	'bun/xirelta',
-	// Crash
-	'bun/bagel',
-	// Crash
-	'bun/bunrest',
-	// Doesn't work properly
-	'bun/colston',
-	// Crash on 0.6.2
-	'bun/zarf',
-	// Crash due to invalid npm version requirement of uWebSockets
-	'deno/byte',
-	// Crash
-	'bun/fastify',
-	// failed to parse body in benchmark
-	'bun/byte',
-	// doesn't run
-	'bun/vixeny',
-	'node/elysia'
-] as const
+const blacklists = [] as const
 
 const time = 10
 
 const commands = [
-	`bombardier --fasthttp -c 500 -d ${time}s http://127.0.0.1:3000/`,
-	`bombardier --fasthttp -c 500 -d ${time}s http://127.0.0.1:3000/id/1?name=bun`,
-	`bombardier --fasthttp -c 500 -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body.json http://127.0.0.1:3000/json`
+	`bombardier --fasthttp -c 100 -d ${time}s http://127.0.0.1:3000/`,
+	`bombardier --fasthttp -c 100 -d ${time}s http://127.0.0.1:3000/id/1?name=bun`,
+	`bombardier --fasthttp -c 100 -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body.json http://127.0.0.1:3000/json`
 ] as const
 
 const runtimeCommand = {
@@ -154,7 +136,7 @@ const spawn = (target: string, title = true) => {
 		: `src/${runtime}/${framework}.js`
 
 	const server = Bun.spawn({
-		cmd: [...runtimeCommand[runtime].split(" "), file],
+		cmd: [...runtimeCommand[runtime].split(' '), file],
 		env: {
 			...Bun.env,
 			NODE_ENV: 'production'
@@ -177,9 +159,6 @@ const spawn = (target: string, title = true) => {
 	}
 }
 
-try {
-	if (lstatSync('results').isDirectory()) rimraf.sync('results')
-} catch {}
 await Bun.$`rm -rf ./results`
 mkdirSync('results')
 writeFileSync('results/results.md', '')
@@ -239,7 +218,7 @@ const main = async () => {
 		if (runtimes.includes(runtime)) {
 			const folder = `results/${runtime}`
 
-			if (!lstatSync(folder).isDirectory()) rimraf(folder)
+			if (!lstatSync(folder).isDirectory()) await Bun.$`rm -rf ${folder}`
 		}
 
 		try {
@@ -283,11 +262,12 @@ const main = async () => {
 		]
 
 		const name = framework.replace('/index', '')
+		const displayName = formatFrameworkWithVersion(target!)
 
 		const frameworkResultFile = Bun.file(`results/${runtime}/${name}.txt`)
 		const frameworkResult = frameworkResultFile.writer()
 
-		result.write(`| ${name} | ${runtime} `)
+		result.write(`| ${displayName} | ${runtime} `)
 
 		// Wait .3 second for server to bootup
 		await sleep(0.4)

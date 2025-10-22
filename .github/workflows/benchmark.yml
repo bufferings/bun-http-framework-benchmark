@@ -1,0 +1,136 @@
+name: Benchmark
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+        paths:
+            - 'src/**'
+            - 'bench.ts'
+            - '.github/workflows/benchmark.yml'
+
+jobs:
+    setup:
+        name: Setup Framework List
+        runs-on: ubuntu-latest
+        outputs:
+            frameworks: ${{ steps.list.outputs.frameworks }}
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: List frameworks
+              id: list
+              run: |
+                  FRAMEWORKS=$(bun run scripts/list-frameworks.ts)
+                  echo "frameworks=$FRAMEWORKS" >> $GITHUB_OUTPUT
+                  echo "Found frameworks: $FRAMEWORKS"
+
+    benchmark:
+        name: Benchmark ${{ matrix.framework }}
+        needs: setup
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                framework: ${{ fromJson(needs.setup.outputs.frameworks) }}
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Bun
+              id: bun-setup
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Get Bun version
+              id: bun-version
+              run: echo "bun-version=$(bun --version)" >> $GITHUB_OUTPUT
+
+            - name: Setup Deno
+              id: deno-setup
+              uses: denoland/setup-deno@v2
+              with:
+                  deno-version: v2.x
+
+            - name: Get Deno version
+              id: deno-version
+              run: echo "deno-version=$(deno --version | head -n 1 | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
+
+            - name: Setup Node.js
+              id: node-setup
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+
+            - name: Get Node version
+              id: node-version
+              run: echo "node-version=$(node --version | sed 's/^v//')" >> $GITHUB_OUTPUT
+
+            - name: Install dependencies
+              run: bun install
+
+            - name: Install bombardier
+              run: |
+                  wget https://github.com/codesenberg/bombardier/releases/download/v1.2.6/bombardier-linux-amd64
+                  chmod +x bombardier-linux-amd64
+                  sudo mv bombardier-linux-amd64 /usr/local/bin/bombardier
+
+            - name: Run benchmark
+              run: |
+                  FRAMEWORK="${{ matrix.framework }}"
+                  echo "Running benchmark for $FRAMEWORK"
+                  bun run bench.ts "$FRAMEWORK"
+              env:
+                  NODE_ENV: production
+                  BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
+                  DENO_VERSION: ${{ steps.deno-version.outputs.deno-version }}
+                  NODE_VERSION: ${{ steps.node-version.outputs.node-version }}
+
+            - name: Upload results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: results-${{ matrix.framework }}
+                  path: results/
+                  retention-days: 30
+
+    aggregate:
+        name: Aggregate Results
+        needs: [setup, benchmark]
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: Download all results
+              uses: actions/download-artifact@v4
+              with:
+                  path: artifacts/
+                  pattern: results-*
+
+            - name: Aggregate results
+              run: bun run scripts/aggregate-results.ts
+
+            - name: Upload aggregated results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: benchmark-results
+                  path: results/
+                  retention-days: 90
+
+            - name: Display results
+              run: |
+                  if [ -f results/results.md ]; then
+                    echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
+                    cat results/results.md >> $GITHUB_STEP_SUMMARY
+                  fi

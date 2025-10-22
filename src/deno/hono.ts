@@ -3,7 +3,10 @@ import { Hono, RegExpRouter } from 'https://deno.land/x/hono@v4.3.11/mod.ts'
 const app = new Hono({ router: new RegExpRouter() })
 
 app.get('/', (c) => c.text('Hi'))
-	.post('/json', (c) => c.req.json().then(c.json))
+	.post('/json', async (c) => {
+		const body = await c.req.json()
+		return c.json(body)
+	})
 	.get('/id/:id', (c) => {
 		const id = c.req.param('id')
 		const name = c.req.query('name')
