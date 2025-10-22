@@ -180,7 +180,7 @@ const test = async () => {
 	}
 }
 
-const spawn = (target: string, title = true) => {
+const spawn = async (target: string, title = true) => {
 	let [runtime, framework, index] = target.split('/') as [
 		keyof typeof runtimeCommand,
 		string,
@@ -209,11 +209,64 @@ const spawn = (target: string, title = true) => {
 			...Bun.env,
 			NODE_ENV: 'production'
 		},
-		stdout: 'inherit',
-		stderr: 'inherit'
+		stdout: 'pipe',
+		stderr: 'pipe'
 	})
 
 	console.log(`[spawn] Server spawned with PID: ${server.pid}`)
+
+	// Monitor server output for "Listening" message
+	let resolved = false
+	const serverReady = new Promise<void>((resolve) => {
+		const decoder = new TextDecoder()
+
+		// Timeout fallback
+		const timeoutId = setTimeout(() => {
+			if (!resolved) {
+				console.log('[spawn] Timeout waiting for server ready signal, proceeding anyway...')
+				resolved = true
+				resolve()
+			}
+		}, 30000) // 30 second timeout
+
+		const checkOutput = (chunk: Uint8Array) => {
+			const text = decoder.decode(chunk)
+			process.stdout.write(text) // Still show output
+
+			if (!resolved && (text.includes('Listening on') || text.includes('listening on') || text.includes('Server running'))) {
+				console.log('[spawn] Server ready signal detected!')
+				resolved = true
+				clearTimeout(timeoutId)
+				resolve()
+			}
+		}
+
+		// Read from stdout (continue even after resolve)
+		;(async () => {
+			try {
+				for await (const chunk of server.stdout) {
+					checkOutput(chunk)
+				}
+			} catch (err) {
+				console.error('[spawn] Error reading stdout:', err)
+			}
+		})()
+
+		// Read from stderr (continue even after resolve)
+		;(async () => {
+			try {
+				for await (const chunk of server.stderr) {
+					process.stderr.write(decoder.decode(chunk)) // Show stderr
+				}
+			} catch (err) {
+				console.error('[spawn] Error reading stderr:', err)
+			}
+		})()
+	})
+
+	// Wait for server to be ready
+	await serverReady
+	console.log(`[spawn] Server is ready to accept connections`)
 
 	return async () => {
 		console.log(`[spawn] Killing server PID: ${server.pid}`)
@@ -293,13 +346,10 @@ const main = async () => {
 	console.log('\nTest:')
 	for (const target of frameworks) {
 		console.log(`[main] Starting ${target}...`)
-		const kill = spawn(target!, false)
-		console.log('[main] spawn() returned, server should be starting...')
+		const kill = await spawn(target!, false)
+		console.log('[main] spawn() completed, server is ready!')
 
 		let [runtime, framework] = target!.split('/')
-		console.log(`[main] Waiting for server to start...`)
-		await sleep(0.5)
-		console.log('[main] Sleep completed, checking runtime...')
 
 		if (runtimes.includes(runtime)) {
 			const folder = `results/${runtime}`
@@ -344,7 +394,7 @@ const main = async () => {
 	)
 
 	for (const target of frameworks) {
-		const kill = spawn(target!)
+		const kill = await spawn(target!)
 
 		let [runtime, framework, index] = target!.split('/') as [
 			keyof typeof runtimeCommand,
@@ -359,10 +409,6 @@ const main = async () => {
 		const frameworkResult = frameworkResultFile.writer()
 
 		result.write(`| ${displayName} | ${runtime} `)
-
-		// Wait for server to bootup
-		console.log(`Waiting for server to start...`)
-		await sleep(1)
 
 		let content = ''
 		const total = []
