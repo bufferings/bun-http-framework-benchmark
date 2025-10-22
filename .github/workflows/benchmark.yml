@@ -127,8 +127,27 @@ jobs:
                   path: artifacts/
                   pattern: results-*
 
+            - name: Debug artifacts
+              run: |
+                  echo "=== Artifacts directory structure ==="
+                  ls -la artifacts/ || echo "No artifacts directory"
+                  if [ -d artifacts/ ]; then
+                    find artifacts/ -type f -name "*.md" -o -name "*.txt" | head -20
+                  fi
+
             - name: Aggregate results
               run: bun run scripts/aggregate-results.ts
+
+            - name: Debug results
+              run: |
+                  echo "=== Results directory ==="
+                  ls -la results/ || echo "No results directory"
+                  if [ -f results/results.md ]; then
+                    echo "=== results.md content ==="
+                    cat results/results.md
+                  else
+                    echo "results/results.md not found"
+                  fi
 
             - name: Upload aggregated results
               uses: actions/upload-artifact@v4
@@ -136,10 +155,15 @@ jobs:
                   name: benchmark-results
                   path: results/
                   retention-days: 90
+              if: always()
 
             - name: Display results
               run: |
-                  if [ -f results/results.md ]; then
+                  if [ -f results/results.md ] && [ -s results/results.md ]; then
                     echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
                     cat results/results.md >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
+                    echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
                   fi
+              if: always()
