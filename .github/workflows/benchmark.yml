@@ -95,7 +95,7 @@ jobs:
             - name: Upload results
               uses: actions/upload-artifact@v4
               with:
-                  name: results-${{ matrix.framework }}
+                  name: results-${{ replace(matrix.framework, '/', '-') }}
                   path: results/
                   retention-days: 30
 
