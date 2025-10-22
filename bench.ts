@@ -52,7 +52,7 @@ const secToMin = (seconds: number) =>
 	(seconds % 60 < 10 ? '0' : '') +
 	(seconds % 60)
 
-// Fetch with retry
+// Fetch with retry and timeout
 const retryFetch = (
 	url: string,
 	options?: RequestInit,
@@ -61,14 +61,21 @@ const retryFetch = (
 	rejectEnd?: Function
 ) => {
 	return new Promise<Response>((resolve, reject) => {
-		fetch(url, options)
+		const controller = new AbortController()
+		const timeout = setTimeout(() => {
+			controller.abort()
+		}, 5000) // 5 second timeout per request
+
+		fetch(url, { ...options, signal: controller.signal })
 			.then((a) => {
+				clearTimeout(timeout)
 				if (time > 0) console.log(`   ✓ Connected after ${time} retries`)
 				if (resolveEnd) resolveEnd(a)
 
 				resolve(a)
 			})
 			.catch((e) => {
+				clearTimeout(timeout)
 				if (time > 20) {
 					console.log(`   ✗ Failed to connect after ${time} retries: ${e.message}`)
 					if (rejectEnd) rejectEnd(e)
@@ -85,9 +92,11 @@ const retryFetch = (
 }
 
 const test = async () => {
+	console.log('   [test] Starting test function...')
 	try {
-		console.log('   Testing GET /')
+		console.log('   [test] Testing GET /')
 		const index = await retryFetch('http://127.0.0.1:3000/')
+		console.log('   [test] GET / completed, reading response...')
 
 		const indexText = await index.text()
 		console.log(`   Response: "${indexText}"`)
@@ -231,12 +240,14 @@ const main = async () => {
 
 	console.log('\nTest:')
 	for (const target of frameworks) {
-		console.log(`Starting ${target}...`)
+		console.log(`[main] Starting ${target}...`)
 		const kill = spawn(target!, false)
+		console.log('[main] spawn() returned, server should be starting...')
 
 		let [runtime, framework] = target!.split('/')
-		console.log(`Waiting for server to start...`)
+		console.log(`[main] Waiting for server to start...`)
 		await sleep(0.5)
+		console.log('[main] Sleep completed, checking runtime...')
 
 		if (runtimes.includes(runtime)) {
 			const folder = `results/${runtime}`
@@ -245,16 +256,20 @@ const main = async () => {
 		}
 
 		try {
-			console.log(`Testing ${framework} (${runtime})...`)
-			const kill = await test()
+			console.log(`[main] Testing ${framework} (${runtime})...`)
+			console.log('[main] About to call test()...')
+			await test()
+			console.log('[main] test() completed')
 
 			console.log(`✅ ${framework} (${runtime})`)
 		} catch (error) {
 			console.log(`❌ ${framework} (${runtime})`)
 			console.log('  ', (error as Error)?.message || error)
+			console.log('Stack:', (error as Error)?.stack)
 
 			frameworks.splice(frameworks.indexOf(target!), 1)
 		} finally {
+			console.log(`Killing server for ${framework}...`)
 			await kill()
 		}
 	}
