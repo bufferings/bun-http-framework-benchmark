@@ -125,7 +125,7 @@ for (const artifactDir of artifacts) {
 
 		if (data.length !== commandCount + 3) continue
 
-		const [name, runtime, total] = data
+		const [runtime, name, total] = data
 		results.push({
 			name, // Includes version if present
 			runtime,
@@ -142,8 +142,8 @@ results.sort((a, b) => b.total - a.total)
 
 // Generate final results.md
 const header = `
-|  Framework       | Runtime | Average | Ping       | Query      | Body       |
-| ---------------- | ------- | ------- | ---------- | ---------- | ---------- |
+| Runtime | Framework        |    Average |       Ping |      Query |       Body |
+| ------- | ---------------- | ---------- | ---------- | ---------- | ---------- |
 `
 
 const content = header + results.map((r) => r.row).join('\n') + '\n'
