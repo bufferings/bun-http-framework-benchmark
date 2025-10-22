@@ -75,39 +75,61 @@ const retryFetch = (
 
 		fetch(url, { ...options, signal: controller.signal })
 			.then((a) => {
-				clearTimeout(timeout)
-				if (time > 0) process.stdout.write(`   ✓ Connected after ${time} retries\n`)
+				try {
+					clearTimeout(timeout)
+					if (time > 0) {
+						process.stdout.write(`   ✓ Connected after ${time} retries\n`)
+						process.stderr.write(`   ✓ Connected after ${time} retries\n`)
+					}
 
-				// Use resolveEnd if provided (recursive call), otherwise use resolve (first call)
-				const resolveFunc = resolveEnd || resolve
-				resolveFunc(a)
-				process.stdout.write(`   [retryFetch] Promise resolved (time=${time})\n`)
+					// Use resolveEnd if provided (recursive call), otherwise use resolve (first call)
+					const resolveFunc = resolveEnd || resolve
+					process.stdout.write(`   [retryFetch] About to resolve (time=${time}, hasResolveEnd=${!!resolveEnd})\n`)
+					resolveFunc(a)
+					process.stdout.write(`   [retryFetch] Promise resolved (time=${time})\n`)
+					process.stderr.write(`   [retryFetch] Promise resolved (time=${time})\n`)
+				} catch (err) {
+					console.error(`   [retryFetch] Error in .then(): ${err}`)
+					console.error(`   [retryFetch] Stack:`, err.stack)
+					reject(err)
+				}
 			})
 			.catch((e) => {
-				clearTimeout(timeout)
-				if (time > 20) {
-					console.log(`   ✗ Failed to connect after ${time} retries: ${e.message}`)
-					const rejectFunc = rejectEnd || reject
-					rejectFunc(e)
-					return
+				try {
+					clearTimeout(timeout)
+					if (time > 20) {
+						console.log(`   ✗ Failed to connect after ${time} retries: ${e.message}`)
+						const rejectFunc = rejectEnd || reject
+						rejectFunc(e)
+						return
+					}
+					if (time % 5 === 0) console.log(`   ... retrying (${time}/20)`)
+					setTimeout(
+						() => retryFetch(url, options, time + 1, resolve, reject),
+						300
+					)
+				} catch (err) {
+					console.error(`   [retryFetch] Error in .catch(): ${err}`)
+					reject(err)
 				}
-				if (time % 5 === 0) console.log(`   ... retrying (${time}/20)`)
-				setTimeout(
-					() => retryFetch(url, options, time + 1, resolve, reject),
-					300
-				)
 			})
 	})
 }
 
 const test = async () => {
 	process.stdout.write('   [test] Starting test function...\n')
+	process.stderr.write('   [test] Starting test function...\n')
 	try {
 		process.stdout.write('   [test] Testing GET /\n')
+		process.stderr.write('   [test] Testing GET /\n')
+
 		const index = await retryFetch('http://127.0.0.1:3000/')
+
 		process.stdout.write('   [test] GET / completed, reading response...\n')
+		process.stderr.write('   [test] GET / completed, reading response...\n')
 
 		const indexText = await index.text()
+		process.stdout.write(`   [test] Response text: "${indexText}"\n`)
 		console.log(`   Response: "${indexText}"`)
 		if (indexText !== 'Hi')
 			throw new Error(`Index: Result not match (expected "Hi", got "${indexText}")`)
@@ -150,7 +172,10 @@ const test = async () => {
 			throw new Error('Body: Content-Type not match')
 
 		console.log('   All tests passed!')
+		process.stderr.write('   [test] All tests passed!\n')
 	} catch (error) {
+		console.error('   [test] Error in test():', error)
+		console.error('   [test] Stack:', (error as Error)?.stack)
 		throw error
 	}
 }
@@ -174,16 +199,26 @@ const spawn = (target: string, title = true) => {
 		? `src/${runtime}/${framework}.ts`
 		: `src/${runtime}/${framework}.js`
 
+	console.log(`[spawn] Starting ${runtime} server with file: ${file}`)
+	const cmd = [...runtimeCommand[runtime].split(' '), file]
+	console.log(`[spawn] Command: ${cmd.join(' ')}`)
+
 	const server = Bun.spawn({
-		cmd: [...runtimeCommand[runtime].split(' '), file],
+		cmd,
 		env: {
 			...Bun.env,
 			NODE_ENV: 'production'
-		}
+		},
+		stdout: 'inherit',
+		stderr: 'inherit'
 	})
 
+	console.log(`[spawn] Server spawned with PID: ${server.pid}`)
+
 	return async () => {
+		console.log(`[spawn] Killing server PID: ${server.pid}`)
 		await server.kill()
+		console.log(`[spawn] Server killed, waiting...`)
 		await sleep(0.3)
 
 		try {
