@@ -58,19 +58,22 @@ const retryFetch = (
 	return new Promise<Response>((resolve, reject) => {
 		fetch(url, options)
 			.then((a) => {
+				if (time > 0) console.log(`   ✓ Connected after ${time} retries`)
 				if (resolveEnd) resolveEnd(a)
 
 				resolve(a)
 			})
 			.catch((e) => {
-				if (time > 7) {
+				if (time > 20) {
+					console.log(`   ✗ Failed to connect after ${time} retries: ${e.message}`)
 					if (rejectEnd) rejectEnd(e)
 
 					return reject(e)
 				}
+				if (time % 5 === 0) console.log(`   ... retrying (${time}/20)`)
 				setTimeout(
 					() => retryFetch(url, options, time + 1, resolve, reject),
-					200
+					300
 				)
 			})
 	})
@@ -210,10 +213,12 @@ const main = async () => {
 
 	console.log('\nTest:')
 	for (const target of frameworks) {
+		console.log(`Starting ${target}...`)
 		const kill = spawn(target!, false)
 
 		let [runtime, framework] = target!.split('/')
-		await sleep(0.1)
+		console.log(`Waiting for server to start...`)
+		await sleep(0.5)
 
 		if (runtimes.includes(runtime)) {
 			const folder = `results/${runtime}`
@@ -222,6 +227,7 @@ const main = async () => {
 		}
 
 		try {
+			console.log(`Testing ${framework} (${runtime})...`)
 			const kill = await test()
 
 			console.log(`✅ ${framework} (${runtime})`)
@@ -269,8 +275,9 @@ const main = async () => {
 
 		result.write(`| ${displayName} | ${runtime} `)
 
-		// Wait .3 second for server to bootup
-		await sleep(0.4)
+		// Wait for server to bootup
+		console.log(`Waiting for server to start...`)
+		await sleep(1)
 
 		let content = ''
 		const total = []
