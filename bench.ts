@@ -390,8 +390,8 @@ const arrange = () => {
 
 			const [runtime, name, total] = data
 			orders.push({
-				name,
 				runtime,
+				name,
 				total: toNumber(total),
 				row
 			})

@@ -127,8 +127,8 @@ for (const artifactDir of artifacts) {
 
 		const [runtime, name, total] = data
 		results.push({
-			name, // Includes version if present
 			runtime,
+			name, // Includes version if present
 			total: toNumber(total),
 			row: line
 		})
