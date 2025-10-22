@@ -92,10 +92,16 @@ jobs:
                   DENO_VERSION: ${{ steps.deno-version.outputs.deno-version }}
                   NODE_VERSION: ${{ steps.node-version.outputs.node-version }}
 
+            - name: Set artifact name
+              id: artifact-name
+              run: |
+                  ARTIFACT_NAME=$(echo "${{ matrix.framework }}" | tr '/' '-')
+                  echo "name=results-$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
             - name: Upload results
               uses: actions/upload-artifact@v4
               with:
-                  name: results-${{ replace(matrix.framework, '/', '-') }}
+                  name: ${{ steps.artifact-name.outputs.name }}
                   path: results/
                   retention-days: 30
 
