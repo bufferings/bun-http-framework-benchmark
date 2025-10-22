@@ -35,7 +35,7 @@ jobs:
     benchmark:
         name: Benchmark ${{ matrix.framework }}
         needs: setup
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04-arm64
         timeout-minutes: 5
         strategy:
             fail-fast: false
@@ -79,9 +79,9 @@ jobs:
 
             - name: Install bombardier
               run: |
-                  wget https://github.com/codesenberg/bombardier/releases/download/v1.2.6/bombardier-linux-amd64
-                  chmod +x bombardier-linux-amd64
-                  sudo mv bombardier-linux-amd64 /usr/local/bin/bombardier
+                  wget https://github.com/codesenberg/bombardier/releases/download/v1.2.6/bombardier-linux-arm64
+                  chmod +x bombardier-linux-arm64
+                  sudo mv bombardier-linux-arm64 /usr/local/bin/bombardier
 
             - name: Run benchmark
               run: |
