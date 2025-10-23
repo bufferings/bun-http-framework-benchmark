@@ -1,5 +1,5 @@
-const { createKori } = require('@korix/kori')
-const { startNodejsServer } = require('@korix/nodejs-server')
+import { createKori } from '@korix/kori'
+import { startNodejsServer } from '@korix/nodejs-server'
 
 const app = createKori()
 
