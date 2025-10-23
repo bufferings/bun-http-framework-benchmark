@@ -1,6 +1,3 @@
-const { Hono } = require('hono')
-const { serve } = require('@hono/node-server')
-const { RegExpRouter } = require('hono/router/reg-exp-router')
 const { createKori } = require('@korix/kori')
 const { startNodejsServer } = require('@korix/nodejs-server')
 
