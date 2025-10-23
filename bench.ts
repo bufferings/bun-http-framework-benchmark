@@ -22,7 +22,7 @@ if (targetFrameworks.length > 0) {
 
 const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 
-const time = 40
+const time = 10
 const connections = 200
 
 const commands = [
@@ -61,7 +61,6 @@ const retryFetch = (
 	return new Promise<Response>((resolve, reject) => {
 		const controller = new AbortController()
 		const timeout = setTimeout(() => {
-			console.log(`   ⏱ Request timeout after 5s (attempt ${time})`)
 			controller.abort()
 		}, 5000) // 5 second timeout per request
 
@@ -138,23 +137,6 @@ const test = async () => {
 	}
 }
 
-const warmup = async () => {
-	console.log('   Warming up...')
-	const iterations = 100
-	for (let i = 0; i < iterations; i++) {
-		await Promise.all([
-			fetch('http://127.0.0.1:3000/').catch(() => {}),
-			fetch('http://127.0.0.1:3000/id/1?name=bun').catch(() => {}),
-			fetch('http://127.0.0.1:3000/json', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ hello: 'world' })
-			}).catch(() => {})
-		])
-	}
-	console.log('   Warmup complete')
-}
-
 const spawn = async (target: string, title = true) => {
 	let [runtime, framework, index] = target.split('/') as [
 		keyof typeof runtimeCommand,
@@ -186,64 +168,30 @@ const spawn = async (target: string, title = true) => {
 		stderr: 'pipe'
 	})
 
-	// Monitor server output for "Listening" message
-	let resolved = false
-	const serverReady = new Promise<void>((resolve) => {
-		const decoder = new TextDecoder()
-
-		const timeoutId = setTimeout(() => {
-			if (!resolved) {
-				resolved = true
-				resolve()
+	// Wait for server to be ready by polling with fetch
+	const maxRetries = 30
+	let retries = 0
+	while (retries < maxRetries) {
+		try {
+			await fetch('http://127.0.0.1:3000/')
+			break
+		} catch {
+			retries++
+			if (retries >= maxRetries) {
+				throw new Error('Server failed to start after 30 attempts')
 			}
-		}, 30000) // 30 second timeout
-
-		const checkOutput = (chunk: Uint8Array) => {
-			const text = decoder.decode(chunk)
-			process.stdout.write(text)
-
-			if (
-				!resolved &&
-				(text.includes('Listening on') ||
-					text.includes('listening on') ||
-					text.includes('Server running') ||
-					text.includes('started at'))
-			) {
-				resolved = true
-				clearTimeout(timeoutId)
-				resolve()
-			}
+			await sleep(0.1)
 		}
-
-		// Read from stdout (continue even after resolve)
-		;(async () => {
-			for await (const chunk of server.stdout) {
-				checkOutput(chunk)
-			}
-		})()
-
-		// Read from stderr (continue even after resolve)
-		;(async () => {
-			for await (const chunk of server.stderr) {
-				process.stderr.write(decoder.decode(chunk))
-			}
-		})()
-	})
-
-	await serverReady
+	}
 
 	return async () => {
 		await server.kill()
-		await sleep(0.3)
+		await sleep(0.5)
 
 		try {
-			await fetch('http://127.0.0.1:3000')
-			await sleep(0.6)
-			await fetch('http://127.0.0.1:3000')
-
 			await killPort(3000)
 		} catch {
-			// Empty
+			// Already closed
 		}
 	}
 }
@@ -348,9 +296,6 @@ const main = async () => {
 		const frameworkResult = frameworkResultFile.writer()
 
 		result.write(`| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} `)
-
-		// Warmup phase to allow JIT compilation and optimization
-		await warmup()
 
 		let content = ''
 		const total = []
