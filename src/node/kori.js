@@ -17,5 +17,5 @@ app.get('/', (c) => c.res.text('Hi'))
 		return c.res.text(`${id} ${name}`)
 	})
 ;(async () => {
-	await startNodejsServer(app)
+	await startNodejsServer(app, { port: 3000, hostname: '0.0.0.0' })
 })()

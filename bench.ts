@@ -192,7 +192,8 @@ const spawn = async (target: string, title = true) => {
 				!resolved &&
 				(text.includes('Listening on') ||
 					text.includes('listening on') ||
-					text.includes('Server running'))
+					text.includes('Server running') ||
+					text.includes('started at'))
 			) {
 				resolved = true
 				clearTimeout(timeoutId)
