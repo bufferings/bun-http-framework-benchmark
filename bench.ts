@@ -181,6 +181,18 @@ const spawn = async (target: string, title = true) => {
 		stderr: 'pipe'
 	})
 
+	// Continue reading stdout/stderr in background to prevent buffer blocking
+	;(async () => {
+		for await (const _chunk of server.stdout) {
+			// Optionally log: process.stdout.write(new TextDecoder().decode(chunk))
+		}
+	})()
+	;(async () => {
+		for await (const chunk of server.stderr) {
+			process.stderr.write(new TextDecoder().decode(chunk))
+		}
+	})()
+
 	// Wait for server to be ready by polling with fetch
 	const maxRetries = 30
 	let retries = 0
@@ -223,8 +235,6 @@ const main = async () => {
 		// Empty
 	}
 
-	const runtimes = <string[]>[]
-
 	let frameworks = readdirSync('src')
 		.flatMap((runtime) => {
 			if (!lstatSync(`src/${runtime}`).isDirectory()) return
@@ -259,11 +269,6 @@ const main = async () => {
 		const kill = await spawn(target!, false)
 		let [runtime, framework] = target!.split('/')
 
-		if (runtimes.includes(runtime)) {
-			const folder = `results/${runtime}`
-			if (!lstatSync(folder).isDirectory()) await Bun.$`rm -rf ${folder}`
-		}
-
 		try {
 			await test()
 			console.log(`✅ ${framework} (${runtime})`)
@@ -283,8 +288,6 @@ const main = async () => {
 	for (const framework of frameworks) console.log(`- ${framework}`)
 
 	console.log(`\nEstimate time: ${secToMin(estimateTime)} min`)
-
-	// process.exit()
 
 	result.write(
 		`
@@ -337,14 +340,11 @@ const main = async () => {
 		}
 
 		content =
-			`| ${format(
-				total.reduce((a, b) => +a + +b, 0) / total.length
-			)} ` +
+			`| ${format(total.reduce((a, b) => +a + +b, 0) / total.length)} ` +
 			content +
 			'|\n'
 
 		result.write(content)
-		await result.flush()
 
 		await kill()
 	}
