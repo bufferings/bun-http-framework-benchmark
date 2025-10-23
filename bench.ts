@@ -11,7 +11,7 @@ import { formatFrameworkWithVersion } from './scripts/get-versions'
 
 // Get target framework from CLI args: bun bench.ts framework1 framework2
 // Or from environment variable: FRAMEWORKS=framework1,framework2
-// Supports flags: --time=10 --connections=200
+// Supports flags: --time=10 --connections=200 --runs=3
 const args = Bun.argv.slice(2)
 const cliFrameworks = args.filter((arg) => !arg.startsWith('-'))
 const envFrameworks = process.env.FRAMEWORKS?.split(',').filter(Boolean) || []
@@ -30,11 +30,14 @@ const getFlag = (name: string, defaultValue: number): number => {
 
 const time = getFlag('time', 10)
 const connections = getFlag('connections', 64)
+const runs = getFlag('runs', 3) // Number of runs per benchmark to take median
 
 if (targetFrameworks.length > 0) {
 	console.log('Target frameworks:', targetFrameworks)
 }
-console.log(`Configuration: ${time}s duration, ${connections} connections`)
+console.log(
+	`Configuration: ${time}s duration, ${connections} connections, ${runs} runs (median)`
+)
 
 const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 
@@ -99,55 +102,51 @@ const retryFetch = (
 }
 
 const test = async () => {
-	try {
-		const index = await retryFetch('http://127.0.0.1:3000/')
-		const indexText = await index.text()
+	const index = await retryFetch('http://127.0.0.1:3000/')
+	const indexText = await index.text()
 
-		if (indexText !== 'Hi')
-			throw new Error(
-				`Index: Result not match (expected "Hi", got "${indexText}")`
-			)
+	if (indexText !== 'Hi')
+		throw new Error(
+			`Index: Result not match (expected "Hi", got "${indexText}")`
+		)
 
-		if (!index.headers.get('Content-Type')?.includes('text/plain'))
-			throw new Error('Index: Content-Type not match')
+	if (!index.headers.get('Content-Type')?.includes('text/plain'))
+		throw new Error('Index: Content-Type not match')
 
-		const query = await retryFetch('http://127.0.0.1:3000/id/1?name=bun')
-		const queryText = await query.text()
+	const query = await retryFetch('http://127.0.0.1:3000/id/1?name=bun')
+	const queryText = await query.text()
 
-		if (queryText !== '1 bun')
-			throw new Error(
-				`Query: Result not match (expected "1 bun", got "${queryText}")`
-			)
+	if (queryText !== '1 bun')
+		throw new Error(
+			`Query: Result not match (expected "1 bun", got "${queryText}")`
+		)
 
-		if (!query.headers.get('Content-Type')?.includes('text/plain'))
-			throw new Error('Query: Content-Type not match')
+	if (!query.headers.get('Content-Type')?.includes('text/plain'))
+		throw new Error('Query: Content-Type not match')
 
-		if (!query.headers.get('X-Powered-By')?.includes('benchmark'))
-			throw new Error('Query: X-Powered-By not match')
+	if (!query.headers.get('X-Powered-By')?.includes('benchmark'))
+		throw new Error('Query: X-Powered-By not match')
 
-		const body = await retryFetch('http://127.0.0.1:3000/json', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				hello: 'world'
-			})
+	const body = await retryFetch('http://127.0.0.1:3000/json', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			hello: 'world'
 		})
+	})
 
-		const bodyText = await body.text()
-		const expectedBody = JSON.stringify({ hello: 'world' })
+	const bodyText = await body.text()
+	const expectedBody = JSON.stringify({ hello: 'world' })
 
-		if (bodyText !== expectedBody)
-			throw new Error(
-				`Body: Result not match (expected "${expectedBody}", got "${bodyText}")`
-			)
+	if (bodyText !== expectedBody)
+		throw new Error(
+			`Body: Result not match (expected "${expectedBody}", got "${bodyText}")`
+		)
 
-		if (!body.headers.get('Content-Type')?.includes('application/json'))
-			throw new Error('Body: Content-Type not match')
-	} catch (error) {
-		throw error
-	}
+	if (!body.headers.get('Content-Type')?.includes('application/json'))
+		throw new Error('Body: Content-Type not match')
 }
 
 const spawn = async (target: string, title = true) => {
@@ -281,7 +280,7 @@ const main = async () => {
 		}
 	}
 
-	const estimateTime = frameworks.length * (commands.length * time + 1)
+	const estimateTime = frameworks.length * (commands.length * time * runs + 1)
 
 	console.log()
 	console.log(`${frameworks.length} frameworks`)
@@ -319,24 +318,39 @@ const main = async () => {
 		for (const command of commands) {
 			frameworkResult.write(`${command}\n`)
 
-			console.log(command)
+			const runResults: number[] = []
 
-			const res = Bun.spawn({
-				cmd: command.split(' '),
-				env: Bun.env
-			})
+			for (let run = 0; run < runs; run++) {
+				console.log(`[${run + 1}/${runs}] ${command}`)
 
-			await res.exited
-			const stdout = await new Response(res.stdout).text()
-			console.log(stdout)
+				const res = Bun.spawn({
+					cmd: command.split(' '),
+					env: Bun.env
+				})
 
-			const results = catchNumber.exec(stdout)
-			if (!results?.[1]) continue
+				const stdout = await new Response(res.stdout).text()
+				await res.exited
 
-			content += `| ${format(results[1])} `
-			total.push(toNumber(results[1]))
+				const results = catchNumber.exec(stdout)
+				if (results?.[1]) {
+					const value = toNumber(results[1])
+					runResults.push(value)
+					console.log(`  Result: ${results[1]} req/s`)
+				}
+			}
 
-			frameworkResult.write(`${results[1]}\n`)
+			if (runResults.length === 0) continue
+
+			// Sort and take median
+			runResults.sort((a, b) => a - b)
+			const median = runResults[Math.floor(runResults.length / 2)]
+
+			console.log(`  Median: ${median.toFixed(2)} req/s\n`)
+
+			content += `| ${format(median)} `
+			total.push(median)
+
+			frameworkResult.write(`${median}\n`)
 		}
 
 		content =
@@ -365,7 +379,7 @@ const arrange = () => {
 
 		for (const row of rows) {
 			const data = row
-				.replace(/\ /g, '')
+				.replace(/ /g, '')
 				.split('|')
 				.filter((a) => a)
 

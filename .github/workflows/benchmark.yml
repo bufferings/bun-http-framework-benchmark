@@ -13,6 +13,11 @@ on:
                 required: false
                 default: '64'
                 type: string
+            runs:
+                description: 'Number of runs per benchmark (median)'
+                required: false
+                default: '3'
+                type: string
     push:
         branches:
             - main
@@ -99,9 +104,10 @@ jobs:
                   FRAMEWORK="${{ matrix.framework }}"
                   TIME="${{ inputs.time || '30' }}"
                   CONNECTIONS="${{ inputs.connections || '64' }}"
+                  RUNS="${{ inputs.runs || '3' }}"
                   echo "Running benchmark for $FRAMEWORK"
-                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections"
-                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS "$FRAMEWORK"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs (median)"
+                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS "$FRAMEWORK"
               env:
                   NODE_ENV: production
                   BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
