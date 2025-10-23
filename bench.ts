@@ -138,6 +138,23 @@ const test = async () => {
 	}
 }
 
+const warmup = async () => {
+	console.log('   Warming up...')
+	const iterations = 100
+	for (let i = 0; i < iterations; i++) {
+		await Promise.all([
+			fetch('http://127.0.0.1:3000/').catch(() => {}),
+			fetch('http://127.0.0.1:3000/id/1?name=bun').catch(() => {}),
+			fetch('http://127.0.0.1:3000/json', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ hello: 'world' })
+			}).catch(() => {})
+		])
+	}
+	console.log('   Warmup complete')
+}
+
 const spawn = async (target: string, title = true) => {
 	let [runtime, framework, index] = target.split('/') as [
 		keyof typeof runtimeCommand,
@@ -331,6 +348,9 @@ const main = async () => {
 		const frameworkResult = frameworkResultFile.writer()
 
 		result.write(`| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} `)
+
+		// Warmup phase to allow JIT compilation and optimization
+		await warmup()
 
 		let content = ''
 		const total = []
