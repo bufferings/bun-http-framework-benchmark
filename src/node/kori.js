@@ -1,5 +1,5 @@
-import { createKori } from '@korix/kori'
-import { startNodejsServer } from '@korix/nodejs-server'
+const { createKori } = require('@korix/kori')
+const { startNodejsServer } = require('@korix/nodejs-server')
 
 const app = createKori()
 
@@ -16,5 +16,6 @@ app.get('/', (c) => c.res.text('Hi'))
 
 		return c.res.text(`${id} ${name}`)
 	})
-
-await startNodejsServer(app)
+;(async () => {
+	await startNodejsServer(app)
+})()
