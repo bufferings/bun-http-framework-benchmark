@@ -7,7 +7,6 @@ import {
 	writeFileSync
 } from 'fs'
 import killPort from 'kill-port'
-import { $, pathToFileURL } from 'bun'
 import { formatFrameworkWithVersion } from './scripts/get-versions'
 
 // Get target framework from CLI args: bun bench.ts framework1 framework2
@@ -96,7 +95,9 @@ const test = async () => {
 		const indexText = await index.text()
 
 		if (indexText !== 'Hi')
-			throw new Error(`Index: Result not match (expected "Hi", got "${indexText}")`)
+			throw new Error(
+				`Index: Result not match (expected "Hi", got "${indexText}")`
+			)
 
 		if (!index.headers.get('Content-Type')?.includes('text/plain'))
 			throw new Error('Index: Content-Type not match')
@@ -105,7 +106,9 @@ const test = async () => {
 		const queryText = await query.text()
 
 		if (queryText !== '1 bun')
-			throw new Error(`Query: Result not match (expected "1 bun", got "${queryText}")`)
+			throw new Error(
+				`Query: Result not match (expected "1 bun", got "${queryText}")`
+			)
 
 		if (!query.headers.get('Content-Type')?.includes('text/plain'))
 			throw new Error('Query: Content-Type not match')
@@ -127,7 +130,9 @@ const test = async () => {
 		const expectedBody = JSON.stringify({ hello: 'world' })
 
 		if (bodyText !== expectedBody)
-			throw new Error(`Body: Result not match (expected "${expectedBody}", got "${bodyText}")`)
+			throw new Error(
+				`Body: Result not match (expected "${expectedBody}", got "${bodyText}")`
+			)
 
 		if (!body.headers.get('Content-Type')?.includes('application/json'))
 			throw new Error('Body: Content-Type not match')
@@ -183,7 +188,12 @@ const spawn = async (target: string, title = true) => {
 			const text = decoder.decode(chunk)
 			process.stdout.write(text)
 
-			if (!resolved && (text.includes('Listening on') || text.includes('listening on') || text.includes('Server running'))) {
+			if (
+				!resolved &&
+				(text.includes('Listening on') ||
+					text.includes('listening on') ||
+					text.includes('Server running'))
+			) {
 				resolved = true
 				clearTimeout(timeoutId)
 				resolve()
@@ -230,7 +240,6 @@ const resultFile = Bun.file('results/results.md')
 const result = resultFile.writer()
 
 const main = async () => {
-
 	try {
 		await fetch('http://127.0.0.1:3000')
 		await killPort(3000)

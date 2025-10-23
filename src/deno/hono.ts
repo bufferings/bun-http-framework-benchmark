@@ -1,4 +1,5 @@
-import { Hono, RegExpRouter } from 'https://deno.land/x/hono@v4.3.11/mod.ts'
+import { Hono } from 'hono'
+import { RegExpRouter } from 'hono/router/reg-exp-router'
 
 const app = new Hono({ router: new RegExpRouter() })
 

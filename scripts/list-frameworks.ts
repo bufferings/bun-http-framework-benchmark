@@ -1,6 +1,4 @@
-import { readdirSync, lstatSync, existsSync } from 'fs'
-
-const blacklists = [] as const
+import { readdirSync, lstatSync } from 'fs'
 
 const runtimes = readdirSync('src').filter((runtime) => {
 	try {
@@ -15,18 +13,12 @@ const frameworks = runtimes
 		return readdirSync(`src/${runtime}`)
 			.filter(
 				(a) =>
-					a.endsWith('.ts') ||
-					a.endsWith('.js') ||
-					!a.includes('.')
+					a.endsWith('.ts') || a.endsWith('.js') || !a.includes('.')
 			)
 			.map((a) =>
 				a.includes('.')
 					? `${runtime}/` + a.replace(/.(j|t)s$/, '')
 					: `${runtime}/${a}/index`
-			)
-			.filter(
-				(a) =>
-					!blacklists.includes(a as (typeof blacklists)[number])
 			)
 	})
 	.filter((x) => x)

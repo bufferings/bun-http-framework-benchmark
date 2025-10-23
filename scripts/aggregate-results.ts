@@ -69,15 +69,13 @@ for (const artifactDir of artifacts) {
 	}
 
 	// Copy runtime-specific result files
-	const runtimeDirs = readdirSync(artifactPath).filter(
-		(item) => {
-			try {
-				return lstatSync(join(artifactPath, item)).isDirectory()
-			} catch {
-				return false
-			}
+	const runtimeDirs = readdirSync(artifactPath).filter((item) => {
+		try {
+			return lstatSync(join(artifactPath, item)).isDirectory()
+		} catch {
+			return false
 		}
-	)
+	})
 
 	console.log(`Found runtime directories: ${runtimeDirs.join(', ')}`)
 
@@ -142,7 +140,7 @@ results.sort((a, b) => b.total - a.total)
 
 // Generate final results.md
 const header = `
-| Runtime | Framework        |    Average |       Ping |      Query |       Body |
+| Runtime | Framework        | Average    | Ping       | Query      | Body       |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
 `
 

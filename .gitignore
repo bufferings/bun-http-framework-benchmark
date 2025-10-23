@@ -171,3 +171,6 @@ dist
 # Benchmark results
 results/
 artifacts/
+
+# Claude
+.claude/
