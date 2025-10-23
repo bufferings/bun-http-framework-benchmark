@@ -6,12 +6,12 @@ on:
             time:
                 description: 'Benchmark duration in seconds'
                 required: false
-                default: '10'
+                default: '30'
                 type: string
             connections:
                 description: 'Number of concurrent connections'
                 required: false
-                default: '200'
+                default: '500'
                 type: string
     push:
         branches:
@@ -97,8 +97,8 @@ jobs:
             - name: Run benchmark
               run: |
                   FRAMEWORK="${{ matrix.framework }}"
-                  TIME="${{ inputs.time || '10' }}"
-                  CONNECTIONS="${{ inputs.connections || '200' }}"
+                  TIME="${{ inputs.time || '30' }}"
+                  CONNECTIONS="${{ inputs.connections || '500' }}"
                   echo "Running benchmark for $FRAMEWORK"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections"
                   bun run bench.ts --time=$TIME --connections=$CONNECTIONS "$FRAMEWORK"
