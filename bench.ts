@@ -29,7 +29,7 @@ const getFlag = (name: string, defaultValue: number): number => {
 }
 
 const time = getFlag('time', 10)
-const connections = getFlag('connections', 200)
+const connections = getFlag('connections', 64)
 
 if (targetFrameworks.length > 0) {
 	console.log('Target frameworks:', targetFrameworks)
