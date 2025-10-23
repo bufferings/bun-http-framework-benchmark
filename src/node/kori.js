@@ -20,4 +20,4 @@ app.get('/', (c) => c.res.text('Hi'))
 		return c.res.text(`${id} ${name}`)
 	})
 
-startNodejsServer(app)
+await startNodejsServer(app)
