@@ -11,19 +11,32 @@ import { formatFrameworkWithVersion } from './scripts/get-versions'
 
 // Get target framework from CLI args: bun bench.ts framework1 framework2
 // Or from environment variable: FRAMEWORKS=framework1,framework2
-const cliFrameworks = Bun.argv.slice(2).filter((arg) => !arg.startsWith('-'))
+// Supports flags: --time=10 --connections=200
+const args = Bun.argv.slice(2)
+const cliFrameworks = args.filter((arg) => !arg.startsWith('-'))
 const envFrameworks = process.env.FRAMEWORKS?.split(',').filter(Boolean) || []
 const targetFrameworks =
 	cliFrameworks.length > 0 ? cliFrameworks : envFrameworks
 
+// Parse flags
+const getFlag = (name: string, defaultValue: number): number => {
+	const flag = args.find((arg) => arg.startsWith(`--${name}=`))
+	if (flag) {
+		const value = parseInt(flag.split('=')[1])
+		return isNaN(value) ? defaultValue : value
+	}
+	return defaultValue
+}
+
+const time = getFlag('time', 10)
+const connections = getFlag('connections', 200)
+
 if (targetFrameworks.length > 0) {
 	console.log('Target frameworks:', targetFrameworks)
 }
+console.log(`Configuration: ${time}s duration, ${connections} connections`)
 
 const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
-
-const time = 10
-const connections = 200
 
 const commands = [
 	`bombardier --fasthttp -c ${connections} -d ${time}s http://127.0.0.1:3000/`,

@@ -2,6 +2,17 @@ name: Benchmark
 
 on:
     workflow_dispatch:
+        inputs:
+            time:
+                description: 'Benchmark duration in seconds'
+                required: false
+                default: '10'
+                type: string
+            connections:
+                description: 'Number of concurrent connections'
+                required: false
+                default: '200'
+                type: string
     push:
         branches:
             - main
@@ -86,8 +97,11 @@ jobs:
             - name: Run benchmark
               run: |
                   FRAMEWORK="${{ matrix.framework }}"
+                  TIME="${{ inputs.time || '10' }}"
+                  CONNECTIONS="${{ inputs.connections || '200' }}"
                   echo "Running benchmark for $FRAMEWORK"
-                  bun run bench.ts "$FRAMEWORK"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections"
+                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS "$FRAMEWORK"
               env:
                   NODE_ENV: production
                   BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
