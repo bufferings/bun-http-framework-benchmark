@@ -22,9 +22,6 @@ if (targetFrameworks.length > 0) {
 
 const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 
-// ? Not working
-const blacklists = [] as const
-
 const time = 40
 const connections = 200
 
@@ -40,7 +37,7 @@ const runtimeCommand = {
 	bun: 'bun'
 } as const
 
-const catchNumber = /Reqs\/sec\s+(\d+[.|,]\d+)/m
+const catchNumber = /Reqs\/sec\s+(\d+(?:[.|,]\d+)?)/m
 const format = (value: string | number) => {
 	const num = +value
 	return num.toFixed(2).padStart(10)
@@ -269,10 +266,6 @@ const main = async () => {
 						? `${runtime}/` + a.replace(/.(j|t)s$/, '')
 						: `${runtime}/${a}/index`
 				)
-				.filter(
-					(a) =>
-						!blacklists.includes(a as (typeof blacklists)[number])
-				)
 		})
 		.filter((x) => x)
 		.sort()
@@ -347,11 +340,12 @@ const main = async () => {
 
 			console.log(command)
 
-			const res = await Bun.spawn({
+			const res = Bun.spawn({
 				cmd: command.split(' '),
 				env: Bun.env
 			})
 
+			await res.exited
 			const stdout = await new Response(res.stdout).text()
 			console.log(stdout)
 
@@ -361,12 +355,12 @@ const main = async () => {
 			content += `| ${format(results[1])} `
 			total.push(toNumber(results[1]))
 
-			frameworkResult.write(results + '\n')
+			frameworkResult.write(`${results[1]}\n`)
 		}
 
 		content =
 			`| ${format(
-				total.reduce((a, b) => +a + +b, 0) / commands.length
+				total.reduce((a, b) => +a + +b, 0) / total.length
 			)} ` +
 			content +
 			'|\n'
