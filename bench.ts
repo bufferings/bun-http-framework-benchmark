@@ -44,7 +44,10 @@ const whitelists = targetFrameworks.length > 0 ? targetFrameworks : []
 const commands = [
 	`bombardier --fasthttp -c ${connections} -d ${time}s http://127.0.0.1:3000/`,
 	`bombardier --fasthttp -c ${connections} -d ${time}s http://127.0.0.1:3000/id/1?name=bun`,
-	`bombardier --fasthttp -c ${connections} -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body.json http://127.0.0.1:3000/json`
+	`bombardier --fasthttp -c ${connections} -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body.json http://127.0.0.1:3000/json`,
+	`bombardier --fasthttp -c ${connections} -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body-validation.json http://127.0.0.1:3000/validate-zod`,
+	`bombardier --fasthttp -c ${connections} -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body-validation.json http://127.0.0.1:3000/validate-valibot`,
+	`bombardier --fasthttp -c ${connections} -d ${time}s -m POST -H 'Content-Type:application/json' -f ./scripts/body-validation.json http://127.0.0.1:3000/validate-arktype`
 ] as const
 
 const runtimeCommand = {
@@ -147,6 +150,83 @@ const test = async () => {
 
 	if (!body.headers.get('Content-Type')?.includes('application/json'))
 		throw new Error('Body: Content-Type not match')
+}
+
+const testValidation = async () => {
+	const validationBody = {
+		hello: 'world',
+		count: 42,
+		tags: ['test', 'benchmark']
+	}
+
+	// Test Zod validation
+	try {
+		const zod = await retryFetch('http://127.0.0.1:3000/validate-zod', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(validationBody)
+		})
+
+		// If 404, validation not supported
+		if (zod.status === 404) {
+			return false
+		}
+
+		const zodText = await zod.text()
+		const expectedZod = JSON.stringify(validationBody)
+
+		if (zodText !== expectedZod)
+			throw new Error(
+				`Zod: Result not match (expected "${expectedZod}", got "${zodText}")`
+			)
+
+		if (!zod.headers.get('Content-Type')?.includes('application/json'))
+			throw new Error('Zod: Content-Type not match')
+	} catch (e) {
+		// Validation endpoint might not exist for non-kori frameworks
+		if (e instanceof TypeError && e.message.includes('fetch')) {
+			return false // Validation not supported
+		}
+		throw e
+	}
+
+	// Test Valibot validation
+	const valibot = await retryFetch('http://127.0.0.1:3000/validate-valibot', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(validationBody)
+	})
+
+	const valibotText = await valibot.text()
+	const expectedValibot = JSON.stringify(validationBody)
+
+	if (valibotText !== expectedValibot)
+		throw new Error(
+			`Valibot: Result not match (expected "${expectedValibot}", got "${valibotText}")`
+		)
+
+	// Test ArkType validation
+	const arktype = await retryFetch('http://127.0.0.1:3000/validate-arktype', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify(validationBody)
+	})
+
+	const arktypeText = await arktype.text()
+	const expectedArktype = JSON.stringify(validationBody)
+
+	if (arktypeText !== expectedArktype)
+		throw new Error(
+			`ArkType: Result not match (expected "${expectedArktype}", got "${arktypeText}")`
+		)
+
+	return true // Validation supported
 }
 
 const spawn = async (target: string, title = true) => {
@@ -263,6 +343,9 @@ const main = async () => {
 	console.log(`${frameworks.length} frameworks`)
 	for (const framework of frameworks) console.log(`- ${framework}`)
 
+	// Track which frameworks support validation
+	const validationSupport = new Map<string, boolean>()
+
 	console.log('\nTest:')
 	for (const target of frameworks) {
 		const kill = await spawn(target!, false)
@@ -270,7 +353,11 @@ const main = async () => {
 
 		try {
 			await test()
-			console.log(`✅ ${framework} (${runtime})`)
+			const hasValidation = await testValidation()
+			validationSupport.set(target!, hasValidation)
+			console.log(
+				`✅ ${framework} (${runtime})${hasValidation ? ' [+validation]' : ''}`
+			)
 		} catch (error) {
 			console.log(`❌ ${framework} (${runtime})`)
 			console.log('  ', (error as Error)?.message || error)
@@ -290,8 +377,8 @@ const main = async () => {
 
 	result.write(
 		`
-| Runtime | Framework        |    Average |       Ping |      Query |       Body |
-| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
+| Runtime | Framework        |    Average |       Ping |      Query |       Body |        Zod |    Valibot |    ArkType |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
 `
 	)
 
@@ -314,8 +401,19 @@ const main = async () => {
 
 		let content = ''
 		const total = []
+		const hasValidation = validationSupport.get(target!) || false
 
-		for (const command of commands) {
+		for (let i = 0; i < commands.length; i++) {
+			const command = commands[i]
+
+			// Skip validation commands if framework doesn't support them
+			if (i >= 3 && !hasValidation) {
+				frameworkResult.write(`${command}\n`)
+				frameworkResult.write(`N/A\n`)
+				content += `|        N/A `
+				continue
+			}
+
 			frameworkResult.write(`${command}\n`)
 
 			const runResults: number[] = []
@@ -348,7 +446,10 @@ const main = async () => {
 			console.log(`  Median: ${median.toFixed(2)} req/s\n`)
 
 			content += `| ${format(median)} `
-			total.push(median)
+			// Only include first 3 results (Ping, Query, Body) in average
+			if (i < 3) {
+				total.push(median)
+			}
 
 			frameworkResult.write(`${median}\n`)
 		}

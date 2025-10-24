@@ -27,7 +27,7 @@ interface ResultRow {
 const toNumber = (a: string) => +a.replaceAll(',', '')
 
 // Number of benchmark commands (should match bench.ts)
-const commandCount = 3
+const commandCount = 6
 
 const results: ResultRow[] = []
 const runtimes = new Set<string>()
@@ -140,8 +140,8 @@ results.sort((a, b) => b.total - a.total)
 
 // Generate final results.md
 const header = `
-| Runtime | Framework        | Average    | Ping       | Query      | Body       |
-| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
+| Runtime | Framework        | Average    | Ping       | Query      | Body       | Zod        | Valibot    | ArkType    |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
 `
 
 const content = header + results.map((r) => r.row).join('\n') + '\n'
