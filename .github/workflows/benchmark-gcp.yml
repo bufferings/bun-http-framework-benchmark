@@ -80,7 +80,7 @@ jobs:
                     gcloud compute instances create benchmark-runner-$i \
                       --source-machine-image=bench-image \
                       --machine-type=n2-standard-4 \
-                      --no-service-account \
+                      --service-account="" \
                       --no-scopes \
                       --metadata=startup-script='#!/bin/bash
                         # Auto-shutdown after 15 minutes
