@@ -71,8 +71,11 @@ jobs:
 
             - name: Start GCE runner instances
               run: |
+                  set -e
                   COUNT=$(echo '${{ needs.setup.outputs.frameworks }}' | jq '. | length')
                   echo "Starting $COUNT instances..."
+
+                  pids=()
                   for i in $(seq 0 $((COUNT-1))); do
                     gcloud compute instances create benchmark-runner-$i \
                       --source-machine-image=bench-image \
@@ -88,9 +91,23 @@ jobs:
                         sudo -u runner ./run.sh' \
                       --project=${{ env.GCP_PROJECT_ID }} \
                       --zone=${{ env.GCP_ZONE }} &
+                    pids+=($!)
                   done
-                  wait
-                  echo "All $COUNT instances started"
+
+                  # Wait for all background jobs and check exit codes
+                  failed=0
+                  for pid in "${pids[@]}"; do
+                    if ! wait "$pid"; then
+                      failed=1
+                    fi
+                  done
+
+                  if [ $failed -eq 1 ]; then
+                    echo "Some instances failed to start"
+                    exit 1
+                  fi
+
+                  echo "All $COUNT instances started successfully"
 
     benchmark:
         name: Run benchmark on GCE (${{ matrix.framework }})
