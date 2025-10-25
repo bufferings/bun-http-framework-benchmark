@@ -15,6 +15,18 @@ results = results.replace(/^## /gm, '### ')
 // Get current date in YYYY-MM-DD format
 const date = new Date().toISOString().split('T')[0]
 
+// Get runtime versions and benchmark config from environment
+const bunVersion = process.env.BUN_VERSION || 'unknown'
+const nodeVersion = process.env.NODE_VERSION || 'unknown'
+const denoVersion = process.env.DENO_VERSION || 'unknown'
+const benchTime = process.env.BENCH_TIME || '30'
+const benchConnections = process.env.BENCH_CONNECTIONS || '128'
+const benchRuns = process.env.BENCH_RUNS || '1'
+const osInfo = process.env.OS_INFO || 'Ubuntu (GitHub Actions)'
+const cpuModel = process.env.CPU_MODEL || 'unknown'
+const cpuCores = process.env.CPU_CORES || 'unknown'
+const totalMem = process.env.TOTAL_MEM || 'unknown'
+
 // Remove existing results section if present
 const startMarker = '<!-- START BENCHMARK RESULTS -->'
 const endMarker = '<!-- END BENCHMARK RESULTS -->'
@@ -39,6 +51,17 @@ ${startMarker}
 Generated on ${date}
 
 ${results}
+
+### Benchmark Environment
+
+| Item | Value |
+|---|---|
+| Platform | GitHub Actions (ubuntu-latest) |
+| OS | ${osInfo} |
+| CPU | ${cpuModel} (${cpuCores} cores) |
+| Memory | ${totalMem} |
+| Runtimes | Bun ${bunVersion}, Node.js ${nodeVersion}, Deno ${denoVersion} |
+| Configuration | ${benchTime}s duration, ${benchConnections} connections, ${benchRuns} run(s) |
 
 ${endMarker}
 `
