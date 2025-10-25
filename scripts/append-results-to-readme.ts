@@ -61,7 +61,7 @@ ${results}
 | CPU | ${cpuModel} (${cpuCores} cores) |
 | Memory | ${totalMem} |
 | Runtimes | Bun ${bunVersion}, Node.js ${nodeVersion}, Deno ${denoVersion} |
-| Configuration | ${benchTime}s duration, ${benchConnections} connections, ${benchRuns} run(s) |
+| Benchmark | bombardier (${benchTime}s, ${benchConnections} connections) × ${benchRuns} run(s) |
 
 ${endMarker}
 `
