@@ -246,7 +246,9 @@ const spawn = async (target: string, title = true) => {
 
 	const file = existsSync(`./src/${runtime}/${framework}.ts`)
 		? `src/${runtime}/${framework}.ts`
-		: `src/${runtime}/${framework}.js`
+		: existsSync(`./src/${runtime}/${framework}.mjs`)
+			? `src/${runtime}/${framework}.mjs`
+			: `src/${runtime}/${framework}.js`
 
 	const cmd = [...runtimeCommand[runtime].split(' '), file]
 
@@ -326,11 +328,12 @@ const main = async () => {
 					(a) =>
 						a.endsWith('.ts') ||
 						a.endsWith('.js') ||
+						a.endsWith('.mjs') ||
 						!a.includes('.')
 				)
 				.map((a) =>
 					a.includes('.')
-						? `${runtime}/` + a.replace(/.(j|t)s$/, '')
+						? `${runtime}/` + a.replace(/\.(m?j|t)s$/, '')
 						: `${runtime}/${a}/index`
 				)
 		})
@@ -377,12 +380,19 @@ const main = async () => {
 
 	console.log(`\nEstimate time: ${secToMin(estimateTime)} min`)
 
+	// Write basic benchmark table header
 	result.write(
 		`
-| Runtime | Framework        |    Average |       Ping |      Query |       Body |        Zod |    Valibot |    ArkType |
-| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: | ---------: |
+## Basic Benchmarks
+
+| Runtime | Framework        |    Average |       Ping |      Query |       Body |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
 `
 	)
+
+	// Prepare validation table content
+	let validationTableContent = ''
+	const validationFrameworks: string[] = []
 
 	for (const target of frameworks) {
 		const kill = await spawn(target!)
@@ -399,11 +409,15 @@ const main = async () => {
 		const frameworkResultFile = Bun.file(`results/${runtime}/${name}.txt`)
 		const frameworkResult = frameworkResultFile.writer()
 
-		result.write(`| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} `)
-
-		let content = ''
-		const total = []
 		const hasValidation = validationSupport.get(target!) || false
+
+		// Basic benchmarks (first 3 commands)
+		let basicContent = ''
+		const basicResults = []
+
+		// Validation benchmarks (last 3 commands)
+		let validationContent = ''
+		const validationResults = []
 
 		for (let i = 0; i < commands.length; i++) {
 			const command = commands[i]
@@ -412,7 +426,6 @@ const main = async () => {
 			if (i >= 3 && !hasValidation) {
 				frameworkResult.write(`${command}\n`)
 				frameworkResult.write(`N/A\n`)
-				content += `|        N/A `
 				continue
 			}
 
@@ -447,23 +460,50 @@ const main = async () => {
 
 			console.log(`  Median: ${median.toFixed(2)} req/s\n`)
 
-			content += `| ${format(median)} `
-			// Only include first 3 results (Ping, Query, Body) in average
-			if (i < 3) {
-				total.push(median)
-			}
-
 			frameworkResult.write(`${median}\n`)
+
+			// Separate basic and validation results
+			if (i < 3) {
+				basicContent += `| ${format(median)} `
+				basicResults.push(median)
+			} else {
+				validationContent += `| ${format(median)} `
+				validationResults.push(median)
+			}
 		}
 
-		content =
-			`| ${format(total.reduce((a, b) => +a + +b, 0) / total.length)} ` +
-			content +
-			'|\n'
+		// Write basic benchmark row
+		const basicAverage =
+			basicResults.length > 0
+				? basicResults.reduce((a, b) => +a + +b, 0) / basicResults.length
+				: 0
+		result.write(
+			`| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} | ${format(basicAverage)} ${basicContent}|\n`
+		)
 
-		result.write(content)
+		// Add to validation table if framework supports validation
+		if (hasValidation && validationResults.length > 0) {
+			validationFrameworks.push(target!)
+			const validationAverage =
+				validationResults.reduce((a, b) => +a + +b, 0) /
+				validationResults.length
+			validationTableContent += `| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} | ${format(validationAverage)} ${validationContent}|\n`
+		}
 
 		await kill()
+	}
+
+	// Write validation table if there are frameworks that support it
+	if (validationFrameworks.length > 0) {
+		result.write(
+			`
+## Validation Benchmarks
+
+| Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
+`
+		)
+		result.write(validationTableContent)
 	}
 
 	await result.flush()
@@ -477,31 +517,78 @@ const arrange = () => {
 			encoding: 'utf-8'
 		})
 
-		const orders = []
-		const [title, divider, ...rows] = table.split('\n')
+		const lines = table.split('\n')
+		const basicOrders = []
+		const validationOrders = []
 
-		for (const row of rows) {
-			const data = row
+		let currentSection = ''
+
+		for (let i = 0; i < lines.length; i++) {
+			const line = lines[i]
+
+			if (line.startsWith('## Basic Benchmarks')) {
+				currentSection = 'basic'
+				continue
+			} else if (line.startsWith('## Validation Benchmarks')) {
+				currentSection = 'validation'
+				continue
+			}
+
+			// Skip empty lines and headers
+			if (!line.trim() || line.startsWith('|') === false) continue
+
+			// Detect table header
+			if (line.includes('Runtime') && line.includes('Framework')) {
+				continue
+			}
+
+			// Detect divider
+			if (line.includes('---')) {
+				continue
+			}
+
+			// Parse data rows
+			const data = line
 				.replace(/ /g, '')
 				.split('|')
 				.filter((a) => a)
 
-			if (data.length !== commands.length + 3) continue
+			// Basic table has 6 columns (Runtime, Framework, Average, Ping, Query, Body)
+			// Validation table has 6 columns (Runtime, Framework, Average, Zod, Valibot, ArkType)
+			if (data.length !== 6) continue
 
 			const [runtime, name, total] = data
-			orders.push({
+
+			const order = {
 				runtime,
 				name,
 				total: toNumber(total),
-				row
-			})
+				row: line
+			}
+
+			if (currentSection === 'basic') {
+				basicOrders.push(order)
+			} else if (currentSection === 'validation') {
+				validationOrders.push(order)
+			}
 		}
 
-		const content = [
-			title,
-			divider,
-			...orders.sort((a, b) => b.total - a.total).map((a) => a.row)
-		].join('\n')
+		// Sort both tables by total (descending)
+		basicOrders.sort((a, b) => b.total - a.total)
+		validationOrders.sort((a, b) => b.total - a.total)
+
+		// Reconstruct the content
+		let content = '\n## Basic Benchmarks\n\n'
+		content += '| Runtime | Framework        |    Average |       Ping |      Query |       Body |\n'
+		content += '| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |\n'
+		content += basicOrders.map((a) => a.row).join('\n')
+
+		if (validationOrders.length > 0) {
+			content += '\n\n## Validation Benchmarks\n\n'
+			content += '| Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |\n'
+			content += '| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |\n'
+			content += validationOrders.map((a) => a.row).join('\n')
+		}
 
 		console.log('\nFinal results:')
 		console.log(content)
