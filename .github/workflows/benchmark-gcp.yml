@@ -75,8 +75,8 @@ jobs:
                   COUNT=$(echo '${{ needs.setup.outputs.frameworks }}' | jq '. | length')
                   echo "Starting $COUNT instances..."
 
-                  pids=()
                   for i in $(seq 0 $((COUNT-1))); do
+                    echo "Creating instance benchmark-runner-$i..."
                     gcloud compute instances create benchmark-runner-$i \
                       --source-machine-image=bench-image \
                       --machine-type=n2-standard-4 \
@@ -90,22 +90,13 @@ jobs:
                         cd /actions-runner
                         sudo -u runner ./run.sh' \
                       --project=${{ env.GCP_PROJECT_ID }} \
-                      --zone=${{ env.GCP_ZONE }} &
-                    pids+=($!)
-                  done
+                      --zone=${{ env.GCP_ZONE }}
 
-                  # Wait for all background jobs and check exit codes
-                  failed=0
-                  for pid in "${pids[@]}"; do
-                    if ! wait "$pid"; then
-                      failed=1
+                    # Wait a bit to avoid rate limiting
+                    if [ $i -lt $((COUNT-1)) ]; then
+                      sleep 2
                     fi
                   done
-
-                  if [ $failed -eq 1 ]; then
-                    echo "Some instances failed to start"
-                    exit 1
-                  fi
 
                   echo "All $COUNT instances started successfully"
 
