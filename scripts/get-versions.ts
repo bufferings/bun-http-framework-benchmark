@@ -14,7 +14,8 @@ const packageMap: Record<string, string> = {
 	// Node frameworks
 	'node/express': 'express',
 	'node/fastify': 'fastify',
-	'node/hono': 'hono'
+	'node/hono': 'hono',
+	'node/kori': '@korix/kori'
 }
 
 let packageJson: any = null

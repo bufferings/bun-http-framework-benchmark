@@ -13,11 +13,11 @@ const frameworks = runtimes
 		return readdirSync(`src/${runtime}`)
 			.filter(
 				(a) =>
-					a.endsWith('.ts') || a.endsWith('.js') || !a.includes('.')
+					a.endsWith('.ts') || a.endsWith('.js') || a.endsWith('.mjs') || !a.includes('.')
 			)
 			.map((a) =>
 				a.includes('.')
-					? `${runtime}/` + a.replace(/.(j|t)s$/, '')
+					? `${runtime}/` + a.replace(/\.(m?j|t)s$/, '')
 					: `${runtime}/${a}/index`
 			)
 	})

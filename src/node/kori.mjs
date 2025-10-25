@@ -1,12 +1,12 @@
-const { createKori } = require('@korix/kori')
-const { startNodejsServer } = require('@korix/nodejs-server')
-const {
+import { createKori } from '@korix/kori'
+import { startNodejsServer } from '@korix/nodejs-server'
+import {
 	enableStdRequestValidation,
 	stdRequestSchema
-} = require('@korix/standard-schema-adapter')
-const { z } = require('zod')
-const v = require('valibot')
-const { type } = require('arktype')
+} from '@korix/standard-schema-adapter'
+import { z } from 'zod'
+import * as v from 'valibot'
+import { type } from 'arktype'
 
 const app = createKori({
 	...enableStdRequestValidation()
@@ -68,3 +68,4 @@ app.get('/', (c) => c.res.text('Hi'))
 ;(async () => {
 	await startNodejsServer(app, { port: 3000, hostname: '0.0.0.0' })
 })()
+

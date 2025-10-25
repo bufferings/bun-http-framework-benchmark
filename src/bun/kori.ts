@@ -26,7 +26,7 @@ const valibotSchema = v.object({
 
 const arktypeSchema = type({
 	hello: 'string',
-	'count': 'number>0',
+	count: 'number>0',
 	'tags?': 'string[]'
 })
 
@@ -45,21 +45,21 @@ app.get('/', (c) => c.res.text('Hi'))
 	})
 	.post('/validate-zod', {
 		requestSchema: stdRequestSchema({ body: zodSchema }),
-		handler: async (c) => {
+		handler: (c) => {
 			const body = c.req.validatedBody()
 			return c.res.json(body)
 		}
 	})
 	.post('/validate-valibot', {
 		requestSchema: stdRequestSchema({ body: valibotSchema }),
-		handler: async (c) => {
+		handler: (c) => {
 			const body = c.req.validatedBody()
 			return c.res.json(body)
 		}
 	})
 	.post('/validate-arktype', {
 		requestSchema: stdRequestSchema({ body: arktypeSchema }),
-		handler: async (c) => {
+		handler: (c) => {
 			const body = c.req.validatedBody()
 			return c.res.json(body)
 		}

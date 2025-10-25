@@ -1,10 +1,10 @@
-const { Hono } = require("hono")
-const { serve } = require("@hono/node-server")
-const { RegExpRouter } = require("hono/router/reg-exp-router")
-const { sValidator } = require("@hono/standard-validator")
-const { z } = require("zod")
-const v = require("valibot")
-const { type } = require("arktype")
+import { Hono } from 'hono'
+import { serve } from '@hono/node-server'
+import { RegExpRouter } from 'hono/router/reg-exp-router'
+import { sValidator } from '@hono/standard-validator'
+import { z } from 'zod'
+import * as v from 'valibot'
+import { type } from 'arktype'
 
 const app = new Hono({ router: new RegExpRouter() })
 
@@ -23,17 +23,17 @@ const valibotSchema = v.object({
 
 const arktypeSchema = type({
 	hello: 'string',
-	'count': 'number>0',
+	count: 'number>0',
 	'tags?': 'string[]'
 })
 
-app.get("/", (c) => c.text("Hi"))
-	.post("/json", (c) => c.req.json().then(c.json))
-	.get("/id/:id", (c) => {
-		const id = c.req.param("id")
-		const name = c.req.query("name")
+app.get('/', (c) => c.text('Hi'))
+	.post('/json', (c) => c.req.json().then(c.json))
+	.get('/id/:id', (c) => {
+		const id = c.req.param('id')
+		const name = c.req.query('name')
 
-		c.header("x-powered-by", "benchmark")
+		c.header('x-powered-by', 'benchmark')
 
 		return c.text(`${id} ${name}`)
 	})
@@ -51,3 +51,4 @@ app.get("/", (c) => c.text("Hi"))
 	})
 
 serve(app)
+
