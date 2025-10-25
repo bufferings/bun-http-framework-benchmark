@@ -94,7 +94,7 @@ jobs:
 
                     # Wait a bit to avoid rate limiting
                     if [ $i -lt $((COUNT-1)) ]; then
-                      sleep 2
+                      sleep 5
                     fi
                   done
 
@@ -156,10 +156,9 @@ jobs:
               run: |
                   # Get all instances matching the name pattern
                   INSTANCES=$(gcloud compute instances list \
-                    --filter="name~'^benchmark-runner-[0-9]+$'" \
+                    --filter="name~'^benchmark-runner-[0-9]+$' AND zone:${{ env.GCP_ZONE }}" \
                     --format="value(name)" \
-                    --project=${{ env.GCP_PROJECT_ID }} \
-                    --zone=${{ env.GCP_ZONE }})
+                    --project=${{ env.GCP_PROJECT_ID }})
 
                   if [ -n "$INSTANCES" ]; then
                     echo "Stopping instances: $INSTANCES"
