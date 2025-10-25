@@ -3,6 +3,7 @@ import { readFileSync } from 'fs'
 // Map framework names to their package names
 const packageMap: Record<string, string> = {
 	// Bun frameworks
+	'bun/elysia': 'elysia',
 	'bun/express': 'express',
 	'bun/hono': 'hono',
 	'bun/kori': '@korix/kori',
