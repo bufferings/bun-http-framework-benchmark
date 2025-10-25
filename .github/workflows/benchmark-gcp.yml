@@ -73,20 +73,22 @@ jobs:
               run: |
                   COUNT=$(echo '${{ needs.setup.outputs.frameworks }}' | jq '. | length')
                   echo "Starting $COUNT instances..."
-                  gcloud compute instances bulk create \
-                    --count=$COUNT \
-                    --name-pattern="benchmark-runner-#" \
-                    --source-machine-image=bench-image \
-                    --machine-type=n2-standard-4 \
-                    --metadata=startup-script='#!/bin/bash
-                      # Auto-shutdown after 15 minutes
-                      echo "sudo shutdown -h now" | at now + 15 minutes
+                  for i in $(seq 0 $((COUNT-1))); do
+                    gcloud compute instances create benchmark-runner-$i \
+                      --source-machine-image=bench-image \
+                      --machine-type=n2-standard-4 \
+                      --metadata=startup-script='#!/bin/bash
+                        # Auto-shutdown after 15 minutes
+                        echo "sudo shutdown -h now" | at now + 15 minutes
 
-                      # Start GitHub Actions runner
-                      cd /actions-runner
-                      sudo -u runner ./run.sh' \
-                    --project=${{ env.GCP_PROJECT_ID }} \
-                    --zone=${{ env.GCP_ZONE }}
+                        # Start GitHub Actions runner
+                        cd /actions-runner
+                        sudo -u runner ./run.sh' \
+                      --project=${{ env.GCP_PROJECT_ID }} \
+                      --zone=${{ env.GCP_ZONE }} &
+                  done
+                  wait
+                  echo "All $COUNT instances started"
 
     benchmark:
         name: Run benchmark on GCE (${{ matrix.framework }})
