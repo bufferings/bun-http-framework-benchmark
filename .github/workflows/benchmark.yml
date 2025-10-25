@@ -6,7 +6,7 @@ on:
             time:
                 description: 'Benchmark duration in seconds'
                 required: false
-                default: '10'
+                default: '30'
                 type: string
             connections:
                 description: 'Number of concurrent connections'
@@ -72,7 +72,7 @@ jobs:
 
             - name: Run all benchmarks
               run: |
-                  TIME="${{ inputs.time || '10' }}"
+                  TIME="${{ inputs.time || '30' }}"
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
