@@ -24,7 +24,9 @@ const endIndex = readme.indexOf(endMarker)
 
 if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
 	// Remove the section between markers (including both markers)
-	readme = readme.substring(0, startIndex) + readme.substring(endIndex + endMarker.length)
+	const before = readme.substring(0, startIndex).trimEnd()
+	const after = readme.substring(endIndex + endMarker.length).trimStart()
+	readme = before + (after ? '\n\n' + after : '')
 }
 
 // Append new results

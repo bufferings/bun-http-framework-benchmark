@@ -35,7 +35,3 @@ bun bench.ts bun/kori node/kori
 # Custom settings
 bun bench.ts bun/kori --time=10 --connections=64 --runs=3
 ```
-
-## Results
-
-Run benchmarks to generate `results/results.md` with performance data measured in requests/second (req/s).
