@@ -101,3 +101,20 @@ jobs:
                     echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
                   fi
               if: always()
+
+            - name: Append results to README
+              run: bun scripts/append-results-to-readme.ts
+              if: success()
+
+            - name: Commit and push results
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add README.md
+                  if git diff --cached --quiet; then
+                    echo "No changes to commit"
+                  else
+                    git commit -m "Update benchmark results - $(date +%Y-%m-%d)"
+                    git push
+                  fi
+              if: success()
