@@ -2,7 +2,6 @@
 	"name": "bun-http-framework-benchmark",
 	"scripts": {
 		"benchmark": "bun bench.ts",
-		"benchmark:single": "bun bench.ts",
 		"list-frameworks": "bun scripts/list-frameworks.ts",
 		"aggregate-results": "bun scripts/aggregate-results.ts",
 		"kill-port": "kill-port 3000"
@@ -19,6 +18,7 @@
 		"@korix/nodejs-server": "^0.3.3",
 		"@korix/standard-schema-adapter": "^0.3.3",
 		"arktype": "^2.1.23",
+		"elysia": "^1.4.13",
 		"express": "^5.1.0",
 		"fastify": "^5.3.2",
 		"hono": "^4.10.2",

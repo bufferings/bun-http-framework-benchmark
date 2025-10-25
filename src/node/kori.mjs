@@ -27,7 +27,7 @@ const valibotSchema = v.object({
 
 const arktypeSchema = type({
 	hello: 'string',
-	'count': 'number>0',
+	count: 'number>0',
 	'tags?': 'string[]'
 })
 
@@ -68,4 +68,3 @@ app.get('/', (c) => c.res.text('Hi'))
 ;(async () => {
 	await startNodejsServer(app, { port: 3000, hostname: '0.0.0.0' })
 })()
-

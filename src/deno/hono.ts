@@ -22,7 +22,7 @@ const valibotSchema = v.object({
 
 const arktypeSchema = type({
 	hello: 'string',
-	'count': 'number>0',
+	count: 'number>0',
 	'tags?': 'string[]'
 })
 

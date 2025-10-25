@@ -51,4 +51,3 @@ app.get('/', (c) => c.text('Hi'))
 	})
 
 serve(app)
-
