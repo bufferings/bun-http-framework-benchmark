@@ -1,6 +1,8 @@
 # Kori Framework Benchmarks
 
-Performance benchmarks for [Kori](https://github.com/korix/kori) across Bun, Node.js, and Deno runtimes.
+> This repository is based on [SaltyAom/bun-http-framework-benchmark](https://github.com/SaltyAom/bun-http-framework-benchmark), adapted for Kori framework development.
+
+Performance benchmarks for [Kori](https://github.com/bufferings/kori) across Bun, Node.js, and Deno runtimes.
 
 Kori uses Hono's router internally, aiming to stay within ~10% overhead.
 
@@ -37,7 +39,3 @@ bun bench.ts bun/kori --time=10 --connections=64 --runs=3
 ## Results
 
 Run benchmarks to generate `results/results.md` with performance data measured in requests/second (req/s).
-
----
-
-This repository is based on [SaltyAom/bun-http-framework-benchmark](https://github.com/SaltyAom/bun-http-framework-benchmark), adapted for Kori framework development.
