@@ -356,7 +356,9 @@ const main = async () => {
 			const hasValidation = await testValidation()
 			validationSupport.set(target!, hasValidation)
 			console.log(
-				`✅ ${framework} (${runtime})${hasValidation ? ' [+validation]' : ''}`
+				`✅ ${framework} (${runtime})${
+					hasValidation ? ' [+validation]' : ''
+				}`
 			)
 		} catch (error) {
 			console.log(`❌ ${framework} (${runtime})`)

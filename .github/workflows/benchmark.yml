@@ -6,17 +6,17 @@ on:
             time:
                 description: 'Benchmark duration in seconds'
                 required: false
-                default: '30'
+                default: '10'
                 type: string
             connections:
                 description: 'Number of concurrent connections'
                 required: false
-                default: '64'
+                default: '128'
                 type: string
             runs:
                 description: 'Number of runs per benchmark (median)'
                 required: false
-                default: '3'
+                default: '1'
                 type: string
 
 concurrency:
@@ -24,36 +24,10 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    setup:
-        name: Setup Framework List
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-        outputs:
-            frameworks: ${{ steps.list.outputs.frameworks }}
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
-
-            - name: List frameworks
-              id: list
-              run: |
-                  FRAMEWORKS=$(bun run scripts/list-frameworks.ts)
-                  echo "frameworks=$FRAMEWORKS" >> $GITHUB_OUTPUT
-                  echo "Found frameworks: $FRAMEWORKS"
-
     benchmark:
-        name: Benchmark ${{ matrix.framework }}
-        needs: setup
+        name: Run All Benchmarks
         runs-on: ubuntu-latest
-        timeout-minutes: 20
-        strategy:
-            fail-fast: false
-            matrix:
-                framework: ${{ fromJson(needs.setup.outputs.frameworks) }}
+        timeout-minutes: 60
         steps:
             - uses: actions/checkout@v4
 
@@ -96,77 +70,20 @@ jobs:
                   chmod +x bombardier-linux-amd64
                   sudo mv bombardier-linux-amd64 /usr/local/bin/bombardier
 
-            - name: Run benchmark
+            - name: Run all benchmarks
               run: |
-                  FRAMEWORK="${{ matrix.framework }}"
-                  TIME="${{ inputs.time || '30' }}"
-                  CONNECTIONS="${{ inputs.connections || '64' }}"
-                  RUNS="${{ inputs.runs || '3' }}"
-                  echo "Running benchmark for $FRAMEWORK"
-                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs (median)"
-                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS "$FRAMEWORK"
+                  TIME="${{ inputs.time || '10' }}"
+                  CONNECTIONS="${{ inputs.connections || '128' }}"
+                  RUNS="${{ inputs.runs || '1' }}"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
+                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
               env:
                   NODE_ENV: production
                   BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
                   DENO_VERSION: ${{ steps.deno-version.outputs.deno-version }}
                   NODE_VERSION: ${{ steps.node-version.outputs.node-version }}
 
-            - name: Set artifact name
-              id: artifact-name
-              run: |
-                  ARTIFACT_NAME=$(echo "${{ matrix.framework }}" | tr '/' '-')
-                  echo "name=results-$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-
             - name: Upload results
-              uses: actions/upload-artifact@v4
-              with:
-                  name: ${{ steps.artifact-name.outputs.name }}
-                  path: results/
-                  retention-days: 30
-
-    aggregate:
-        name: Aggregate Results
-        needs: [setup, benchmark]
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-        if: always()
-        steps:
-            - uses: actions/checkout@v4
-
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
-
-            - name: Download all results
-              uses: actions/download-artifact@v4
-              with:
-                  path: artifacts/
-                  pattern: results-*
-
-            - name: Debug artifacts
-              run: |
-                  echo "=== Artifacts directory structure ==="
-                  ls -la artifacts/ || echo "No artifacts directory"
-                  if [ -d artifacts/ ]; then
-                    find artifacts/ -type f -name "*.md" -o -name "*.txt" | head -20
-                  fi
-
-            - name: Aggregate results
-              run: bun run scripts/aggregate-results.ts
-
-            - name: Debug results
-              run: |
-                  echo "=== Results directory ==="
-                  ls -la results/ || echo "No results directory"
-                  if [ -f results/results.md ]; then
-                    echo "=== results.md content ==="
-                    cat results/results.md
-                  else
-                    echo "results/results.md not found"
-                  fi
-
-            - name: Upload aggregated results
               uses: actions/upload-artifact@v4
               with:
                   name: benchmark-results
