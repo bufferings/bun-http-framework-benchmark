@@ -1,0 +1,175 @@
+name: benchmark-gcp
+
+on:
+    workflow_dispatch:
+        inputs:
+            time:
+                description: 'Benchmark duration in seconds'
+                required: false
+                default: '30'
+                type: string
+            connections:
+                description: 'Number of concurrent connections'
+                required: false
+                default: '64'
+                type: string
+            runs:
+                description: 'Number of runs per benchmark (median)'
+                required: false
+                default: '3'
+                type: string
+
+concurrency:
+    group: benchmark-gcp
+    cancel-in-progress: true
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GCP_ZONE: ${{ secrets.GCP_ZONE }}
+
+jobs:
+    setup:
+        name: Setup Framework List
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        outputs:
+            frameworks: ${{ steps.list.outputs.frameworks }}
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Setup Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: latest
+
+            - name: List frameworks
+              id: list
+              run: |
+                  FRAMEWORKS=$(bun run scripts/list-frameworks.ts)
+                  echo "frameworks=$FRAMEWORKS" >> $GITHUB_OUTPUT
+                  echo "Found frameworks: $FRAMEWORKS"
+
+    start-runner:
+        name: Start GCE runners
+        needs: setup
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Start GCE runner instances
+              run: |
+                  COUNT=$(echo '${{ needs.setup.outputs.frameworks }}' | jq '. | length')
+                  echo "Starting $COUNT instances..."
+                  gcloud compute instances bulk create \
+                    --count=$COUNT \
+                    --name-pattern="benchmark-runner-#" \
+                    --source-machine-image=bench-image \
+                    --machine-type=n2-standard-4 \
+                    --metadata=startup-script='#!/bin/bash
+                      # Auto-shutdown after 15 minutes
+                      echo "sudo shutdown -h now" | at now + 15 minutes
+
+                      # Start GitHub Actions runner
+                      cd /actions-runner
+                      sudo -u runner ./run.sh' \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+    benchmark:
+        name: Run benchmark on GCE (${{ matrix.framework }})
+        needs: [setup, start-runner]
+        strategy:
+            fail-fast: false
+            matrix:
+                framework: ${{ fromJson(needs.setup.outputs.frameworks) }}
+        runs-on: [self-hosted, bench-gcp]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Run benchmark
+              run: |
+                  FRAMEWORK="${{ matrix.framework }}"
+                  TIME="${{ inputs.time || '30' }}"
+                  CONNECTIONS="${{ inputs.connections || '64' }}"
+                  RUNS="${{ inputs.runs || '3' }}"
+                  echo "Running benchmark for $FRAMEWORK"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs (median)"
+                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS "$FRAMEWORK"
+
+            - name: Set artifact name
+              id: artifact-name
+              run: |
+                  ARTIFACT_NAME=$(echo "${{ matrix.framework }}" | tr '/' '-')
+                  echo "name=results-$ARTIFACT_NAME" >> $GITHUB_OUTPUT
+
+            - name: Upload results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ steps.artifact-name.outputs.name }}
+                  path: results/
+                  retention-days: 30
+
+    stop-runner:
+        name: Stop GCE runners
+        needs: [start-runner, benchmark]
+        if: always()
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Stop all GCE runner instances
+              run: |
+                  # Get all instances matching the name pattern
+                  INSTANCES=$(gcloud compute instances list \
+                    --filter="name~'^benchmark-runner-[0-9]+$'" \
+                    --format="value(name)" \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }})
+
+                  if [ -n "$INSTANCES" ]; then
+                    echo "Stopping instances: $INSTANCES"
+                    echo "$INSTANCES" | xargs gcloud compute instances stop \
+                      --project=${{ env.GCP_PROJECT_ID }} \
+                      --zone=${{ env.GCP_ZONE }}
+                  else
+                    echo "No instances to stop"
+                  fi
+
+    summarize:
+        name: Summarize results
+        runs-on: ubuntu-latest
+        needs: [benchmark]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/download-artifact@v4
+              with:
+                  path: result
+            - name: Generate summary
+              run: bun run tools/summary.ts result
+            - uses: actions/upload-artifact@v4
+              with:
+                  name: summary
+                  path: result/summary.md

@@ -18,13 +18,6 @@ on:
                 required: false
                 default: '3'
                 type: string
-    push:
-        branches:
-            - main
-        paths:
-            - 'src/**'
-            - 'bench.ts'
-            - '.github/workflows/benchmark.yml'
 
 jobs:
     setup:
