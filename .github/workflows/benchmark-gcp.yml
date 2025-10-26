@@ -45,6 +45,7 @@ jobs:
                   project_id: ${{ secrets.GCP_PROJECT_ID }}
                   workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
                   service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+                  create_credentials_file: false
 
             - name: Setup gcloud
               uses: google-github-actions/setup-gcloud@v3.0.1
@@ -127,6 +128,7 @@ jobs:
                   project_id: ${{ secrets.GCP_PROJECT_ID }}
                   workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
                   service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+                  create_credentials_file: false
 
             - name: Setup gcloud
               uses: google-github-actions/setup-gcloud@v3.0.1
