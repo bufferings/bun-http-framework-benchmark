@@ -247,8 +247,8 @@ const spawn = async (target: string, title = true) => {
 	const file = existsSync(`./src/${runtime}/${framework}.ts`)
 		? `src/${runtime}/${framework}.ts`
 		: existsSync(`./src/${runtime}/${framework}.mjs`)
-			? `src/${runtime}/${framework}.mjs`
-			: `src/${runtime}/${framework}.js`
+		? `src/${runtime}/${framework}.mjs`
+		: `src/${runtime}/${framework}.js`
 
 	const cmd = [...runtimeCommand[runtime].split(' '), file]
 
@@ -304,9 +304,35 @@ const spawn = async (target: string, title = true) => {
 
 await Bun.$`rm -rf ./results`
 mkdirSync('results')
-writeFileSync('results/results.md', '')
-const resultFile = Bun.file('results/results.md')
-const result = resultFile.writer()
+
+// Types for benchmark results
+type BenchmarkResult = {
+	framework: string
+	runtime: string
+	displayName: string
+	hasValidation: boolean
+	basic: {
+		ping: number
+		query: number
+		body: number
+		average: number
+	}
+	validation?: {
+		zod: number
+		valibot: number
+		arktype: number
+		average: number
+	}
+}
+
+type Results = {
+	config: {
+		time: number
+		connections: number
+		runs: number
+	}
+	benchmarks: BenchmarkResult[]
+}
 
 const main = async () => {
 	try {
@@ -380,19 +406,7 @@ const main = async () => {
 
 	console.log(`\nEstimate time: ${secToMin(estimateTime)} min`)
 
-	// Write basic benchmark table header
-	result.write(
-		`
-## Basic Benchmarks
-
-| Runtime | Framework        |    Average |       Ping |      Query |       Body |
-| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
-`
-	)
-
-	// Prepare validation table content
-	let validationTableContent = ''
-	const validationFrameworks: string[] = []
+	const benchmarkResults: BenchmarkResult[] = []
 
 	for (const target of frameworks) {
 		const kill = await spawn(target!)
@@ -411,13 +425,8 @@ const main = async () => {
 
 		const hasValidation = validationSupport.get(target!) || false
 
-		// Basic benchmarks (first 3 commands)
-		let basicContent = ''
-		const basicResults = []
-
-		// Validation benchmarks (last 3 commands)
-		let validationContent = ''
-		const validationResults = []
+		const basicResults: number[] = []
+		const validationResults: number[] = []
 
 		for (let i = 0; i < commands.length; i++) {
 			const command = commands[i]
@@ -464,131 +473,198 @@ const main = async () => {
 
 			// Separate basic and validation results
 			if (i < 3) {
-				basicContent += `| ${format(median)} `
 				basicResults.push(median)
 			} else {
-				validationContent += `| ${format(median)} `
 				validationResults.push(median)
 			}
 		}
 
-		// Write basic benchmark row
-		const basicAverage =
-			basicResults.length > 0
-				? basicResults.reduce((a, b) => +a + +b, 0) / basicResults.length
-				: 0
-		result.write(
-			`| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} | ${format(basicAverage)} ${basicContent}|\n`
-		)
+		await frameworkResult.flush()
 
-		// Add to validation table if framework supports validation
-		if (hasValidation && validationResults.length > 0) {
-			validationFrameworks.push(target!)
-			const validationAverage =
-				validationResults.reduce((a, b) => +a + +b, 0) /
-				validationResults.length
-			validationTableContent += `| ${runtime.padEnd(7)} | ${displayName.padEnd(16)} | ${format(validationAverage)} ${validationContent}|\n`
+		// Create benchmark result object
+		const benchmarkResult: BenchmarkResult = {
+			framework: name,
+			runtime,
+			displayName,
+			hasValidation,
+			basic: {
+				ping: basicResults[0] || 0,
+				query: basicResults[1] || 0,
+				body: basicResults[2] || 0,
+				average:
+					basicResults.length > 0
+						? basicResults.reduce((a, b) => a + b, 0) /
+						  basicResults.length
+						: 0
+			}
 		}
+
+		if (hasValidation && validationResults.length > 0) {
+			benchmarkResult.validation = {
+				zod: validationResults[0] || 0,
+				valibot: validationResults[1] || 0,
+				arktype: validationResults[2] || 0,
+				average:
+					validationResults.reduce((a, b) => a + b, 0) /
+					validationResults.length
+			}
+		}
+
+		benchmarkResults.push(benchmarkResult)
 
 		await kill()
 	}
 
-	// Write validation table if there are frameworks that support it
-	if (validationFrameworks.length > 0) {
-		result.write(
-			`
+	// Save results as JSON
+	const results: Results = {
+		config: {
+			time,
+			connections,
+			runs
+		},
+		benchmarks: benchmarkResults
+	}
+
+	writeFileSync('results/results.json', JSON.stringify(results, null, 2))
+	console.log('\nResults saved to results/results.json')
+}
+
+const toNumber = (a: string) => +a.replaceAll(',', '')
+
+const report = async () => {
+	try {
+		// Read JSON results
+		const resultsJson = readFileSync('results/results.json', {
+			encoding: 'utf-8'
+		})
+		const results: Results = JSON.parse(resultsJson)
+
+		// Sort benchmarks by basic average (descending)
+		const sortedBasic = [...results.benchmarks].sort(
+			(a, b) => b.basic.average - a.basic.average
+		)
+
+		// Sort benchmarks by validation average (descending)
+		const sortedValidation = results.benchmarks
+			.filter((b) => b.hasValidation && b.validation)
+			.sort((a, b) => b.validation!.average - a.validation!.average)
+
+		// Get environment information
+		const platform = process.env.PLATFORM || 'Local'
+		let osInfo = 'Unknown'
+		let cpuModel = 'Unknown'
+		let cpuCores = 'Unknown'
+		let totalMem = 'Unknown'
+
+		try {
+			// Try Linux commands first (for GitHub Actions / GCP)
+			try {
+				osInfo = (await Bun.$`lsb_release -d`.text())
+					.replace('Description:', '')
+					.trim()
+			} catch {
+				osInfo = (await Bun.$`uname -s -r`.text()).trim()
+			}
+
+			try {
+				cpuModel = (await Bun.$`lscpu`.text())
+					.split('\n')
+					.find((line) => line.startsWith('Model name:'))
+					?.split(':')[1]
+					?.trim() || 'Unknown'
+				cpuCores = (await Bun.$`nproc`.text()).trim()
+			} catch {
+				cpuModel = (await Bun.$`uname -m`.text()).trim()
+				cpuCores = 'Unknown'
+			}
+
+			try {
+				totalMem = (await Bun.$`free -h`.text())
+					.split('\n')[1]
+					.split(/\s+/)[1]
+			} catch {
+				totalMem = 'Unknown'
+			}
+		} catch {
+			// Fallback for macOS or other systems
+			osInfo = (await Bun.$`uname -s -r`.text()).trim()
+			cpuModel = (await Bun.$`uname -m`.text()).trim()
+		}
+
+		const bunVersion = Bun.version
+
+		let nodeVersion = 'N/A'
+		try {
+			nodeVersion = (await Bun.$`node --version`.text())
+				.trim()
+				.replace(/^v/, '')
+		} catch {
+			// Node.js not installed
+		}
+
+		let denoVersion = 'N/A'
+		try {
+			denoVersion = (await Bun.$`deno --version`.text())
+				.split('\n')[0]
+				.split(' ')[1]
+		} catch {
+			// Deno not installed
+		}
+
+		// Generate markdown content
+		let content = `
+## Latest Benchmark Results
+
+Generated on ${new Date().toISOString().split('T')[0]}
+
+## Basic Benchmarks
+
+| Runtime | Framework        |    Average |       Ping |      Query |       Body |
+| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
+`
+
+		for (const b of sortedBasic) {
+			content += `| ${b.runtime.padEnd(7)} | ${b.displayName.padEnd(
+				16
+			)} | ${format(b.basic.average)} | ${format(
+				b.basic.ping
+			)} | ${format(b.basic.query)} | ${format(b.basic.body)} |\n`
+		}
+
+		if (sortedValidation.length > 0) {
+			content += `
 ## Validation Benchmarks
 
 | Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
 `
-		)
-		result.write(validationTableContent)
-	}
 
-	await result.flush()
-}
-
-const toNumber = (a: string) => +a.replaceAll(',', '')
-
-const arrange = () => {
-	try {
-		const table = readFileSync('results/results.md', {
-			encoding: 'utf-8'
-		})
-
-		const lines = table.split('\n')
-		const basicOrders = []
-		const validationOrders = []
-
-		let currentSection = ''
-
-		for (let i = 0; i < lines.length; i++) {
-			const line = lines[i]
-
-			if (line.startsWith('## Basic Benchmarks')) {
-				currentSection = 'basic'
-				continue
-			} else if (line.startsWith('## Validation Benchmarks')) {
-				currentSection = 'validation'
-				continue
-			}
-
-			// Skip empty lines and headers
-			if (!line.trim() || line.startsWith('|') === false) continue
-
-			// Detect table header
-			if (line.includes('Runtime') && line.includes('Framework')) {
-				continue
-			}
-
-			// Detect divider
-			if (line.includes('---')) {
-				continue
-			}
-
-			// Parse data rows
-			const data = line
-				.replace(/ /g, '')
-				.split('|')
-				.filter((a) => a)
-
-			// Basic table has 6 columns (Runtime, Framework, Average, Ping, Query, Body)
-			// Validation table has 6 columns (Runtime, Framework, Average, Zod, Valibot, ArkType)
-			if (data.length !== 6) continue
-
-			const [runtime, name, total] = data
-
-			const order = {
-				runtime,
-				name,
-				total: toNumber(total),
-				row: line
-			}
-
-			if (currentSection === 'basic') {
-				basicOrders.push(order)
-			} else if (currentSection === 'validation') {
-				validationOrders.push(order)
+			for (const b of sortedValidation) {
+				content += `| ${b.runtime.padEnd(7)} | ${b.displayName.padEnd(
+					16
+				)} | ${format(b.validation!.average)} | ${format(
+					b.validation!.zod
+				)} | ${format(b.validation!.valibot)} | ${format(
+					b.validation!.arktype
+				)} |\n`
 			}
 		}
 
-		// Sort both tables by total (descending)
-		basicOrders.sort((a, b) => b.total - a.total)
-		validationOrders.sort((a, b) => b.total - a.total)
+		// Add environment information
+		content += `
+### Benchmark Environment
 
-		// Reconstruct the content
-		let content = '\n## Basic Benchmarks\n\n'
-		content += '| Runtime | Framework        |    Average |       Ping |      Query |       Body |\n'
-		content += '| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |\n'
-		content += basicOrders.map((a) => a.row).join('\n')
-
-		if (validationOrders.length > 0) {
-			content += '\n\n## Validation Benchmarks\n\n'
-			content += '| Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |\n'
-			content += '| ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |\n'
-			content += validationOrders.map((a) => a.row).join('\n')
-		}
+| Item | Value |
+|---|---|
+| Platform | ${platform} |
+| OS | ${osInfo} |
+| CPU | ${cpuModel} (${cpuCores} cores) |
+| Memory | ${totalMem} |
+| Runtimes | Bun ${bunVersion}, Node.js ${nodeVersion}, Deno ${denoVersion} |
+| Benchmark | bombardier (${results.config.time}s, ${
+			results.config.connections
+		} connections) × ${results.config.runs} run(s) |
+`
 
 		console.log('\nFinal results:')
 		console.log(content)
@@ -596,7 +672,7 @@ const arrange = () => {
 
 		process.exit(0)
 	} catch (error) {
-		console.error('\nError in arrange():', error)
+		console.error('\nError in report():', error)
 		process.exit(0)
 	}
 }
@@ -606,9 +682,9 @@ process.on('beforeExit', async () => {
 })
 
 main()
-	.then(arrange)
+	.then(report)
 	.catch((error) => {
-		console.error('\nError in main():', error)
+		console.error('\nError:', error)
 		console.error('Stack:', error.stack)
 		process.exit(1)
 	})

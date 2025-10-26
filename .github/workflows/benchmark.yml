@@ -32,34 +32,19 @@ jobs:
             - uses: actions/checkout@v4
 
             - name: Setup Bun
-              id: bun-setup
               uses: oven-sh/setup-bun@v2
               with:
                   bun-version: latest
 
-            - name: Get Bun version
-              id: bun-version
-              run: echo "bun-version=$(bun --version)" >> $GITHUB_OUTPUT
-
             - name: Setup Deno
-              id: deno-setup
               uses: denoland/setup-deno@v2
               with:
                   deno-version: v2.x
 
-            - name: Get Deno version
-              id: deno-version
-              run: echo "deno-version=$(deno --version | head -n 1 | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
-
             - name: Setup Node.js
-              id: node-setup
               uses: actions/setup-node@v4
               with:
                   node-version: '22'
-
-            - name: Get Node version
-              id: node-version
-              run: echo "node-version=$(node --version | sed 's/^v//')" >> $GITHUB_OUTPUT
 
             - name: Get system info
               id: system-info
@@ -87,9 +72,7 @@ jobs:
                   bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
               env:
                   NODE_ENV: production
-                  BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
-                  DENO_VERSION: ${{ steps.deno-version.outputs.deno-version }}
-                  NODE_VERSION: ${{ steps.node-version.outputs.node-version }}
+                  PLATFORM: GitHub Actions (ubuntu-latest)
 
             - name: Upload results
               uses: actions/upload-artifact@v4
@@ -112,17 +95,6 @@ jobs:
 
             - name: Append results to README
               run: bun scripts/append-results-to-readme.ts
-              env:
-                  BUN_VERSION: ${{ steps.bun-version.outputs.bun-version }}
-                  NODE_VERSION: ${{ steps.node-version.outputs.node-version }}
-                  DENO_VERSION: ${{ steps.deno-version.outputs.deno-version }}
-                  BENCH_TIME: ${{ inputs.time || '30' }}
-                  BENCH_CONNECTIONS: ${{ inputs.connections || '128' }}
-                  BENCH_RUNS: ${{ inputs.runs || '1' }}
-                  OS_INFO: ${{ steps.system-info.outputs.os-info }}
-                  CPU_MODEL: ${{ steps.system-info.outputs.cpu-model }}
-                  CPU_CORES: ${{ steps.system-info.outputs.cpu-cores }}
-                  TOTAL_MEM: ${{ steps.system-info.outputs.total-mem }}
               if: success()
 
             - name: Commit and push results
