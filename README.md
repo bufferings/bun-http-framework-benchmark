@@ -41,11 +41,11 @@ bun bench.ts bun/kori --time=10 --connections=64 --runs=3
 ## Latest Benchmark Results
 
 
-#### Latest Benchmark Results
+### Latest Benchmark Results
 
 Generated on 2025-10-26
 
-#### Basic Benchmarks
+### Basic Benchmarks
 
 | Runtime | Framework        |    Average |       Ping |      Query |       Body |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
@@ -59,7 +59,7 @@ Generated on 2025-10-26
 | node    | kori@0.3.3       |   13847.23 |   17736.78 |   16492.62 |    7312.29 |
 | node    | express@5.1.0    |    6227.49 |    6078.47 |    5967.58 |    6636.41 |
 
-#### Validation Benchmarks
+### Validation Benchmarks
 
 | Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
@@ -71,7 +71,7 @@ Generated on 2025-10-26
 | node    | hono@4.10.2      |    8847.38 |    7305.52 |   10886.43 |    8350.20 |
 | node    | kori@0.3.3       |    5300.22 |    5277.06 |    5314.71 |    5308.88 |
 
-#### Benchmark Environment
+### Benchmark Environment
 
 | Item | Value |
 |---|---|
