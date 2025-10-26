@@ -1,0 +1,143 @@
+name: Benchmark on GCP
+
+on:
+    workflow_dispatch:
+        inputs:
+            vm_name:
+                description: 'GCP VM instance name'
+                required: true
+                type: string
+            time:
+                description: 'Benchmark duration in seconds'
+                required: false
+                default: '30'
+                type: string
+            connections:
+                description: 'Number of concurrent connections'
+                required: false
+                default: '128'
+                type: string
+            runs:
+                description: 'Number of runs per benchmark (median)'
+                required: false
+                default: '1'
+                type: string
+
+concurrency:
+    group: benchmark-gcp-${{ inputs.vm_name }}
+    cancel-in-progress: true
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GCP_ZONE: ${{ secrets.GCP_ZONE }}
+    VM_NAME: ${{ inputs.vm_name }}
+
+jobs:
+    start-vm:
+        name: Start GCP VM
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Start VM instance
+              run: |
+                  echo "Starting VM instance: ${{ env.VM_NAME }}"
+                  gcloud compute instances start ${{ env.VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+            - name: Set auto-shutdown timer
+              run: |
+                  echo "Setting 1-hour auto-shutdown timer on ${{ env.VM_NAME }}"
+                  gcloud compute instances add-metadata ${{ env.VM_NAME }} \
+                    --metadata=startup-script='#!/bin/bash
+                      # Auto-shutdown after 1 hour
+                      echo "sudo shutdown -h now" | at now + 1 hour
+                    ' \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+                  # Trigger metadata update by resetting the instance
+                  gcloud compute instances reset ${{ env.VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+            - name: Wait for VM to be ready
+              run: |
+                  echo "Waiting for VM to be ready..."
+                  sleep 30
+
+    benchmark:
+        name: Run All Benchmarks
+        needs: start-vm
+        runs-on: self-hosted
+        timeout-minutes: 60
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Run benchmark
+              run: |
+                  TIME="${{ inputs.time || '30' }}"
+                  CONNECTIONS="${{ inputs.connections || '128' }}"
+                  RUNS="${{ inputs.runs || '1' }}"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
+                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+
+            - name: Upload results
+              uses: actions/upload-artifact@v4
+              with:
+                  name: benchmark-results-gcp
+                  path: results/
+                  retention-days: 90
+              if: always()
+
+            - name: Display results
+              run: |
+                  if [ -f results/results.md ] && [ -s results/results.md ]; then
+                    echo "## Benchmark Results (GCP)" >> $GITHUB_STEP_SUMMARY
+                    cat results/results.md >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "## Benchmark Results (GCP)" >> $GITHUB_STEP_SUMMARY
+                    echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
+                  fi
+              if: always()
+
+    stop-vm:
+        name: Stop GCP VM
+        needs: [start-vm, benchmark]
+        if: always()
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+
+        steps:
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Stop VM instance
+              run: |
+                  echo "Stopping VM instance: ${{ env.VM_NAME }}"
+                  gcloud compute instances stop ${{ env.VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }} || true
