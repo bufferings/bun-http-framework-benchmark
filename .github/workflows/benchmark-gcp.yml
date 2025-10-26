@@ -3,10 +3,6 @@ name: Benchmark on GCP
 on:
     workflow_dispatch:
         inputs:
-            vm_name:
-                description: 'GCP VM instance name'
-                required: true
-                type: string
             time:
                 description: 'Benchmark duration in seconds'
                 required: false
@@ -24,7 +20,7 @@ on:
                 type: string
 
 concurrency:
-    group: benchmark-gcp-${{ inputs.vm_name }}
+    group: benchmark-gcp
     cancel-in-progress: true
 
 permissions:
@@ -34,7 +30,7 @@ permissions:
 env:
     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
     GCP_ZONE: ${{ secrets.GCP_ZONE }}
-    VM_NAME: ${{ inputs.vm_name }}
+    VM_NAME: bench-vm
 
 jobs:
     start-vm:
