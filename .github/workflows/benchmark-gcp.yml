@@ -113,10 +113,8 @@ jobs:
             - name: Display results
               run: |
                   if [ -f results/results.md ] && [ -s results/results.md ]; then
-                    echo "## Benchmark Results (GCP)" >> $GITHUB_STEP_SUMMARY
                     cat results/results.md >> $GITHUB_STEP_SUMMARY
                   else
-                    echo "## Benchmark Results (GCP)" >> $GITHUB_STEP_SUMMARY
                     echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
                   fi
               if: always()
