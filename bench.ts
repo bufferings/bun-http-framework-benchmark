@@ -567,11 +567,12 @@ const report = async () => {
 			}
 
 			try {
-				cpuModel = (await Bun.$`lscpu`.text())
-					.split('\n')
-					.find((line) => line.startsWith('Model name:'))
-					?.split(':')[1]
-					?.trim() || 'Unknown'
+				cpuModel =
+					(await Bun.$`lscpu`.text())
+						.split('\n')
+						.find((line) => line.startsWith('Model name:'))
+						?.split(':')[1]
+						?.trim() || 'Unknown'
 				cpuCores = (await Bun.$`nproc`.text()).trim()
 			} catch {
 				cpuModel = (await Bun.$`uname -m`.text()).trim()
@@ -617,7 +618,7 @@ const report = async () => {
 
 Generated on ${new Date().toISOString().split('T')[0]}
 
-## Basic Benchmarks
+### Basic Benchmarks
 
 | Runtime | Framework        |    Average |       Ping |      Query |       Body |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
@@ -633,7 +634,7 @@ Generated on ${new Date().toISOString().split('T')[0]}
 
 		if (sortedValidation.length > 0) {
 			content += `
-## Validation Benchmarks
+### Validation Benchmarks
 
 | Runtime | Framework        |    Average |        Zod |    Valibot |    ArkType |
 | ------- | ---------------- | ---------: | ---------: | ---------: | ---------: |
@@ -661,9 +662,7 @@ Generated on ${new Date().toISOString().split('T')[0]}
 | CPU | ${cpuModel} (${cpuCores} cores) |
 | Memory | ${totalMem} |
 | Runtimes | Bun ${bunVersion}, Node.js ${nodeVersion}, Deno ${denoVersion} |
-| Benchmark | bombardier (${results.config.time}s, ${
-			results.config.connections
-		} connections) × ${results.config.runs} run(s) |
+| Benchmark | bombardier (${results.config.time}s, ${results.config.connections} connections) × ${results.config.runs} run(s) |
 `
 
 		console.log('\nFinal results:')
