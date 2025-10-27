@@ -96,11 +96,7 @@ type Results = {
 // Get target VM internal IP
 const getTargetIp = async (): Promise<string> => {
 	console.log(`Getting internal IP of ${targetVmName}...`)
-	const result =
-		await Bun.$`gcloud compute instances describe ${targetVmName} \
-		--zone=${gcpZone} \
-		--project=${gcpProjectId} \
-		--format='get(networkInterfaces[0].networkIP)'`.text()
+	const result = await Bun.$`gcloud compute instances describe ${targetVmName} --zone=${gcpZone} --project=${gcpProjectId} --format='get(networkInterfaces[0].networkIP)'`.text()
 
 	const ip = result.trim()
 	console.log(`Target VM IP: ${ip}`)
