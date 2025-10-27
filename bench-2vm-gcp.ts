@@ -129,7 +129,7 @@ const startServer = async (target: string): Promise<void> => {
 // Stop server on target VM
 const stopServer = async (): Promise<void> => {
 	console.log('Stopping server...')
-	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f '3000'"`.quiet()
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="screen -S benchmark -X quit || pkill -f '3000'"`.quiet()
 	await sleep(2)
 }
 
