@@ -96,7 +96,8 @@ type Results = {
 // Get target VM internal IP
 const getTargetIp = async (): Promise<string> => {
 	console.log(`Getting internal IP of ${targetVmName}...`)
-	const result = await Bun.$`gcloud compute instances describe ${targetVmName} --zone=${gcpZone} --project=${gcpProjectId} --format='get(networkInterfaces[0].networkIP)'`.text()
+	const result =
+		await Bun.$`gcloud compute instances describe ${targetVmName} --zone=${gcpZone} --project=${gcpProjectId} --format='get(networkInterfaces[0].networkIP)'`.text()
 
 	const ip = result.trim()
 	console.log(`Target VM IP: ${ip}`)
@@ -119,6 +120,7 @@ const startServer = async (target: string): Promise<void> => {
 		: `src/${runtime}/${framework}.js`
 
 	const cmd = `screen -dmS benchmark bash -c 'cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1'`
+	console.log(cmd)
 
 	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
 
@@ -508,7 +510,8 @@ const report = async () => {
 		let denoVersion = 'N/A'
 
 		try {
-			const allInfo = await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="lsb_release -d | cut -d: -f2 | xargs; lscpu | grep 'Model name' | cut -d: -f2 | xargs; nproc; free -h | grep Mem | awk '{print \\$2}'; bun --version; node --version | sed 's/^v//'; deno --version | head -n 1 | cut -d ' ' -f 2"`.text()
+			const allInfo =
+				await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="lsb_release -d | cut -d: -f2 | xargs; lscpu | grep 'Model name' | cut -d: -f2 | xargs; nproc; free -h | grep Mem | awk '{print \\$2}'; bun --version; node --version | sed 's/^v//'; deno --version | head -n 1 | cut -d ' ' -f 2"`.text()
 
 			const lines = allInfo.trim().split('\n')
 			if (lines[0]) osInfo = lines[0].trim()
