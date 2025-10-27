@@ -58,22 +58,6 @@ jobs:
                     --project=${{ env.GCP_PROJECT_ID }} \
                     --zone=${{ env.GCP_ZONE }}
 
-            - name: Set auto-shutdown timer
-              run: |
-                  echo "Setting 1-hour auto-shutdown timer on ${{ env.VM_NAME }}"
-                  gcloud compute instances add-metadata ${{ env.VM_NAME }} \
-                    --metadata=startup-script='#!/bin/bash
-                      # Auto-shutdown after 1 hour
-                      echo "sudo shutdown -h now" | at now + 1 hour
-                    ' \
-                    --project=${{ env.GCP_PROJECT_ID }} \
-                    --zone=${{ env.GCP_ZONE }}
-
-                  # Trigger metadata update by resetting the instance
-                  gcloud compute instances reset ${{ env.VM_NAME }} \
-                    --project=${{ env.GCP_PROJECT_ID }} \
-                    --zone=${{ env.GCP_ZONE }}
-
     benchmark:
         name: Run All Benchmarks
         needs: start-vm
