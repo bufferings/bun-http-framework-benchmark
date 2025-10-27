@@ -118,7 +118,7 @@ const startServer = async (target: string): Promise<void> => {
 		? `src/${runtime}/${framework}.mjs`
 		: `src/${runtime}/${framework}.js`
 
-	const cmd = `cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1 &`
+	const cmd = `cd ~/bun-http-framework-benchmark && nohup ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1 < /dev/null &`
 
 	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
 
