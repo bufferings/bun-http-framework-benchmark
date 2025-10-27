@@ -124,11 +124,7 @@ const startServer = async (target: string): Promise<void> => {
 
 	const cmd = `cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1 &`
 
-	await Bun.$`gcloud compute ssh ${targetVmName} \
-		--internal-ip \
-		--zone=${gcpZone} \
-		--project=${gcpProjectId} \
-		--command=${cmd}`.quiet()
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
 
 	console.log('Waiting for server to start...')
 	await sleep(5)
@@ -137,11 +133,7 @@ const startServer = async (target: string): Promise<void> => {
 // Stop server on target VM
 const stopServer = async (): Promise<void> => {
 	console.log('Stopping server...')
-	await Bun.$`gcloud compute ssh ${targetVmName} \
-		--internal-ip \
-		--zone=${gcpZone} \
-		--project=${gcpProjectId} \
-		--command="pkill -f '3000'"`.quiet()
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f '3000'"`.quiet()
 	await sleep(2)
 }
 
@@ -315,11 +307,7 @@ const main = async () => {
 	await Bun.$`gcloud compute scp --recurse --internal-ip --zone=${gcpZone} --project=${gcpProjectId} ./src ./scripts ./package.json ./bun.lockb ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
 
 	console.log('Installing dependencies on target VM...')
-	await Bun.$`gcloud compute ssh ${targetVmName} \
-		--internal-ip \
-		--zone=${gcpZone} \
-		--project=${gcpProjectId} \
-		--command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
 
 	const targetIp = await getTargetIp()
 
@@ -523,17 +511,7 @@ const report = async () => {
 		let denoVersion = 'N/A'
 
 		try {
-			const allInfo = await Bun.$`gcloud compute ssh ${targetVmName} \
-				--internal-ip \
-				--zone=${gcpZone} \
-				--project=${gcpProjectId} \
-				--command="lsb_release -d | cut -d: -f2 | xargs; \
-				           lscpu | grep 'Model name' | cut -d: -f2 | xargs; \
-				           nproc; \
-				           free -h | grep Mem | awk '{print \\$2}'; \
-				           bun --version; \
-				           node --version | sed 's/^v//'; \
-				           deno --version | head -n 1 | cut -d ' ' -f 2"`.text()
+			const allInfo = await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="lsb_release -d | cut -d: -f2 | xargs; lscpu | grep 'Model name' | cut -d: -f2 | xargs; nproc; free -h | grep Mem | awk '{print \\$2}'; bun --version; node --version | sed 's/^v//'; deno --version | head -n 1 | cut -d ' ' -f 2"`.text()
 
 			const lines = allInfo.trim().split('\n')
 			if (lines[0]) osInfo = lines[0].trim()
