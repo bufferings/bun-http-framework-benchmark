@@ -310,11 +310,7 @@ mkdirSync('results')
 const main = async () => {
 	// Sync repository to target VM
 	console.log(`Syncing repository to ${targetVmName}...`)
-	await Bun.$`gcloud compute scp --recurse \
-		--zone=${gcpZone} \
-		--project=${gcpProjectId} \
-		./src ./scripts ./package.json ./bun.lockb \
-		${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
+	await Bun.$`gcloud compute scp --recurse --zone=${gcpZone} --project=${gcpProjectId} ./src ./scripts ./package.json ./bun.lockb ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
 
 	console.log('Installing dependencies on target VM...')
 	await Bun.$`gcloud compute ssh ${targetVmName} \
