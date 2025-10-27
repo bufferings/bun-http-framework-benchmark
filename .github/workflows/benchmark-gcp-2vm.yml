@@ -94,7 +94,7 @@ jobs:
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
-                  bun run bench-2vm-gcp.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+                  bun run bench-2vm-gcp.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS node/fastify
               env:
                   NODE_ENV: production
                   TARGET_VM_NAME: ${{ env.TARGET_VM_NAME }}
