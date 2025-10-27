@@ -120,7 +120,7 @@ const startServer = async (target: string): Promise<void> => {
 
 	const cmd = `cd ~/bun-http-framework-benchmark && nohup ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1 < /dev/null &`
 
-	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`
 
 	console.log('Waiting for server to start...')
 	await sleep(5)
