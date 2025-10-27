@@ -120,7 +120,6 @@ const startServer = async (target: string): Promise<void> => {
 		: `src/${runtime}/${framework}.js`
 
 	const cmd = `screen -dmS benchmark bash -c 'cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1'`
-	console.log(cmd)
 
 	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
 

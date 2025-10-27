@@ -25,7 +25,7 @@ const server = fastify()
 		(req, res) => req.body
 	)
 
-server.listen({ port: 3000 }, function (err) {
+server.listen({ port: 3000, host: '0.0.0.0' }, function (err) {
 	if (err) {
 		server.log.error(err)
 		process.exit(1)
