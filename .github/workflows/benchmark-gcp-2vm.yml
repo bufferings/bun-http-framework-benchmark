@@ -1,4 +1,4 @@
-name: Benchmark on GCP
+name: Benchmark on GCP (2-VM)
 
 on:
     workflow_dispatch:
@@ -20,7 +20,7 @@ on:
                 type: string
 
 concurrency:
-    group: benchmark-gcp
+    group: benchmark-gcp-2vm
     cancel-in-progress: true
 
 permissions:
@@ -30,11 +30,12 @@ permissions:
 env:
     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
     GCP_ZONE: ${{ secrets.GCP_ZONE }}
-    VM_NAME: bench-vm
+    TARGET_VM_NAME: bench-vm-target
+    LOAD_VM_NAME: bench-vm-load
 
 jobs:
-    start-vm:
-        name: Start GCP VM
+    start-vms:
+        name: Start GCP VMs
         runs-on: ubuntu-latest
         timeout-minutes: 10
 
@@ -51,17 +52,24 @@ jobs:
             - name: Setup gcloud
               uses: google-github-actions/setup-gcloud@v3.0.1
 
-            - name: Start VM instance
+            - name: Start target VM
               run: |
-                  echo "Starting VM instance: ${{ env.VM_NAME }}"
-                  gcloud compute instances start ${{ env.VM_NAME }} \
+                  echo "Starting target VM: ${{ env.TARGET_VM_NAME }}"
+                  gcloud compute instances start ${{ env.TARGET_VM_NAME }} \
                     --project=${{ env.GCP_PROJECT_ID }} \
                     --zone=${{ env.GCP_ZONE }}
 
-            - name: Set auto-shutdown timer
+            - name: Start load VM
               run: |
-                  echo "Setting 1-hour auto-shutdown timer on ${{ env.VM_NAME }}"
-                  gcloud compute instances add-metadata ${{ env.VM_NAME }} \
+                  echo "Starting load VM: ${{ env.LOAD_VM_NAME }}"
+                  gcloud compute instances start ${{ env.LOAD_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+            - name: Set auto-shutdown timer on target VM
+              run: |
+                  echo "Setting 1-hour auto-shutdown timer on ${{ env.TARGET_VM_NAME }}"
+                  gcloud compute instances add-metadata ${{ env.TARGET_VM_NAME }} \
                     --metadata=startup-script='#!/bin/bash
                       # Auto-shutdown after 1 hour
                       echo "sudo shutdown -h now" | at now + 1 hour
@@ -70,18 +78,44 @@ jobs:
                     --zone=${{ env.GCP_ZONE }}
 
                   # Trigger metadata update by resetting the instance
-                  gcloud compute instances reset ${{ env.VM_NAME }} \
+                  gcloud compute instances reset ${{ env.TARGET_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+            - name: Set auto-shutdown timer on load VM
+              run: |
+                  echo "Setting 1-hour auto-shutdown timer on ${{ env.LOAD_VM_NAME }}"
+                  gcloud compute instances add-metadata ${{ env.LOAD_VM_NAME }} \
+                    --metadata=startup-script='#!/bin/bash
+                      # Auto-shutdown after 1 hour
+                      echo "sudo shutdown -h now" | at now + 1 hour
+                    ' \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+                  # Trigger metadata update by resetting the instance
+                  gcloud compute instances reset ${{ env.LOAD_VM_NAME }} \
                     --project=${{ env.GCP_PROJECT_ID }} \
                     --zone=${{ env.GCP_ZONE }}
 
     benchmark:
         name: Run All Benchmarks
-        needs: start-vm
+        needs: start-vms
         runs-on: self-hosted
         timeout-minutes: 60
 
         steps:
             - uses: actions/checkout@v4
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
 
             - name: Install dependencies
               run: bun install
@@ -92,15 +126,18 @@ jobs:
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
-                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+                  bun run bench-2vm-gcp.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
               env:
                   NODE_ENV: production
-                  PLATFORM: GCP (bench-vm)
+                  TARGET_VM_NAME: ${{ env.TARGET_VM_NAME }}
+                  GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}
+                  GCP_ZONE: ${{ env.GCP_ZONE }}
+                  PLATFORM: GCP (2-VM)
 
             - name: Upload results
               uses: actions/upload-artifact@v4
               with:
-                  name: benchmark-results-gcp
+                  name: benchmark-results-gcp-2vm
                   path: results/
                   retention-days: 90
               if: always()
@@ -114,9 +151,9 @@ jobs:
                   fi
               if: always()
 
-    stop-vm:
-        name: Stop GCP VM
-        needs: [start-vm, benchmark]
+    stop-vms:
+        name: Stop GCP VMs
+        needs: [start-vms, benchmark]
         if: always()
         runs-on: ubuntu-latest
         timeout-minutes: 5
@@ -134,9 +171,16 @@ jobs:
             - name: Setup gcloud
               uses: google-github-actions/setup-gcloud@v3.0.1
 
-            - name: Stop VM instance
+            - name: Stop target VM
               run: |
-                  echo "Stopping VM instance: ${{ env.VM_NAME }}"
-                  gcloud compute instances stop ${{ env.VM_NAME }} \
+                  echo "Stopping target VM: ${{ env.TARGET_VM_NAME }}"
+                  gcloud compute instances stop ${{ env.TARGET_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }} || true
+
+            - name: Stop load VM
+              run: |
+                  echo "Stopping load VM: ${{ env.LOAD_VM_NAME }}"
+                  gcloud compute instances stop ${{ env.LOAD_VM_NAME }} \
                     --project=${{ env.GCP_PROJECT_ID }} \
                     --zone=${{ env.GCP_ZONE }} || true
