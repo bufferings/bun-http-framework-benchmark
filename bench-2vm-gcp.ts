@@ -125,6 +125,7 @@ const startServer = async (target: string): Promise<void> => {
 	const cmd = `cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1 &`
 
 	await Bun.$`gcloud compute ssh ${targetVmName} \
+		--tunnel-through-iap \
 		--zone=${gcpZone} \
 		--project=${gcpProjectId} \
 		--command=${cmd}`.quiet()
@@ -137,6 +138,7 @@ const startServer = async (target: string): Promise<void> => {
 const stopServer = async (): Promise<void> => {
 	console.log('Stopping server...')
 	await Bun.$`gcloud compute ssh ${targetVmName} \
+		--tunnel-through-iap \
 		--zone=${gcpZone} \
 		--project=${gcpProjectId} \
 		--command="pkill -f '3000'"`.quiet()
@@ -310,10 +312,11 @@ mkdirSync('results')
 const main = async () => {
 	// Sync repository to target VM
 	console.log(`Syncing repository to ${targetVmName}...`)
-	await Bun.$`gcloud compute scp --recurse --zone=${gcpZone} --project=${gcpProjectId} ./src ./scripts ./package.json ./bun.lockb ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
+	await Bun.$`gcloud compute scp --recurse --tunnel-through-iap --zone=${gcpZone} --project=${gcpProjectId} ./src ./scripts ./package.json ./bun.lockb ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
 
 	console.log('Installing dependencies on target VM...')
 	await Bun.$`gcloud compute ssh ${targetVmName} \
+		--tunnel-through-iap \
 		--zone=${gcpZone} \
 		--project=${gcpProjectId} \
 		--command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
@@ -521,6 +524,7 @@ const report = async () => {
 
 		try {
 			const allInfo = await Bun.$`gcloud compute ssh ${targetVmName} \
+				--tunnel-through-iap \
 				--zone=${gcpZone} \
 				--project=${gcpProjectId} \
 				--command="lsb_release -d | cut -d: -f2 | xargs; \
