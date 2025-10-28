@@ -5,9 +5,6 @@ import { z } from 'zod'
 import * as v from 'valibot'
 import { type } from 'arktype'
 
-const app = new Hono({ router: new RegExpRouter() })
-
-// Validation schemas
 const zodSchema = z.object({
 	hello: z.string(),
 	count: z.number().int().positive(),
@@ -26,30 +23,22 @@ const arktypeSchema = type({
 	'tags?': 'string[]'
 })
 
+const app = new Hono({ router: new RegExpRouter() })
+
 app.get('/', (c) => c.text('Hi'))
-	.post('/json', async (c) => {
-		const body = await c.req.json()
-		return c.json(body)
-	})
 	.get('/id/:id', (c) => {
-		const id = c.req.param('id')
-		const name = c.req.query('name')
-
 		c.header('x-powered-by', 'benchmark')
-
-		return c.text(`${id} ${name}`)
+		return c.text(`${c.req.param('id')} ${c.req.query('name')}`)
 	})
-	.post('/validate-zod', sValidator('json', zodSchema), (c) => {
-		const body = c.req.valid('json')
-		return c.json(body)
-	})
-	.post('/validate-valibot', sValidator('json', valibotSchema), (c) => {
-		const body = c.req.valid('json')
-		return c.json(body)
-	})
-	.post('/validate-arktype', sValidator('json', arktypeSchema), (c) => {
-		const body = c.req.valid('json')
-		return c.json(body)
-	})
+	.post('/json', (c) => c.req.json().then((body) => c.json(body)))
+	.post('/validate-zod', sValidator('json', zodSchema), (c) =>
+		c.json(c.req.valid('json'))
+	)
+	.post('/validate-valibot', sValidator('json', valibotSchema), (c) =>
+		c.json(c.req.valid('json'))
+	)
+	.post('/validate-arktype', sValidator('json', arktypeSchema), (c) =>
+		c.json(c.req.valid('json'))
+	)
 
 export default app

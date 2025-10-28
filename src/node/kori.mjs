@@ -8,11 +8,6 @@ import { z } from 'zod'
 import * as v from 'valibot'
 import { type } from 'arktype'
 
-const app = createKori({
-	...enableStdRequestValidation()
-})
-
-// Validation schemas
 const zodSchema = z.object({
 	hello: z.string(),
 	count: z.number().int().positive(),
@@ -31,39 +26,27 @@ const arktypeSchema = type({
 	'tags?': 'string[]'
 })
 
+const app = createKori({
+	...enableStdRequestValidation()
+})
+
 app.get('/', (c) => c.res.text('Hi'))
-	.post('/json', async (c) => {
-		const body = await c.req.bodyJson()
-		return c.res.json(body)
-	})
 	.get('/id/:id', (c) => {
-		const id = c.req.param('id')
-		const name = c.req.query('name')
-
 		c.res.setHeader('x-powered-by', 'benchmark')
-
-		return c.res.text(`${id} ${name}`)
+		return c.res.text(`${c.req.param('id')} ${c.req.query('name')}`)
 	})
+	.post('/json', (c) => c.req.bodyJson().then((body) => c.res.json(body)))
 	.post('/validate-zod', {
 		requestSchema: stdRequestSchema({ body: zodSchema }),
-		handler: async (c) => {
-			const body = c.req.validatedBody()
-			return c.res.json(body)
-		}
+		handler: (c) => c.res.json(c.req.validatedBody())
 	})
 	.post('/validate-valibot', {
 		requestSchema: stdRequestSchema({ body: valibotSchema }),
-		handler: async (c) => {
-			const body = c.req.validatedBody()
-			return c.res.json(body)
-		}
+		handler: (c) => c.res.json(c.req.validatedBody())
 	})
 	.post('/validate-arktype', {
 		requestSchema: stdRequestSchema({ body: arktypeSchema }),
-		handler: async (c) => {
-			const body = c.req.validatedBody()
-			return c.res.json(body)
-		}
+		handler: (c) => c.res.json(c.req.validatedBody())
 	})
 ;(async () => {
 	await startNodejsServer(app, { port: 3000, hostname: '0.0.0.0' })
