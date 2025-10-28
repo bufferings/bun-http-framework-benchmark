@@ -62,7 +62,7 @@ jobs:
         name: Run All Benchmarks
         needs: start-vm
         runs-on: [self-hosted, bench-vm]
-        timeout-minutes: 60
+        timeout-minutes: 120
 
         steps:
             - uses: actions/checkout@v4
