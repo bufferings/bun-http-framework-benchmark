@@ -307,6 +307,9 @@ const main = async () => {
 	console.log('Installing dependencies on target VM...')
 	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
 
+	console.log('Setting ulimit on target VM...')
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="ulimit -n 65535"`.quiet()
+
 	const targetIp = await getTargetIp()
 
 	let frameworks = readdirSync('src')

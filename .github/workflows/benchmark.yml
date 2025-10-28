@@ -65,6 +65,7 @@ jobs:
 
             - name: Run all benchmarks
               run: |
+                  ulimit -n 65535
                   TIME="${{ inputs.time || '30' }}"
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
