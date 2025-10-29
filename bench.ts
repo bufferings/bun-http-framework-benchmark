@@ -275,7 +275,7 @@ const spawn = async (target: string, title = true) => {
 	})()
 
 	// Wait for server to be ready by polling with fetch
-	const maxRetries = 30
+	const maxRetries = 60 // Increased from 30 to allow more time for initial dependency downloads
 	let retries = 0
 	while (retries < maxRetries) {
 		try {
@@ -284,9 +284,9 @@ const spawn = async (target: string, title = true) => {
 		} catch {
 			retries++
 			if (retries >= maxRetries) {
-				throw new Error('Server failed to start after 30 attempts')
+				throw new Error(`Server failed to start after ${maxRetries} attempts`)
 			}
-			await sleep(0.1)
+			await sleep(0.2) // Increased from 0.1 to reduce CPU usage
 		}
 	}
 
