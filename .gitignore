@@ -174,3 +174,6 @@ artifacts/
 
 # Claude
 .claude/
+
+# DS_Store
+.DS_Store
