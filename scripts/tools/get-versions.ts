@@ -106,7 +106,17 @@ export function getVersion(framework: string): string {
 }
 
 export function formatFrameworkWithVersion(framework: string): string {
-	const version = getVersion(framework)
+	// If framework is just a name (e.g., "elysia"), try to find it in packageMap
+	let lookupKey = framework
+	if (!framework.includes('/')) {
+		// Just framework name - use first match from packageMap
+		const foundKey = Object.keys(packageMap).find(key => key.endsWith(`/${framework}`))
+		if (foundKey) {
+			lookupKey = foundKey
+		}
+	}
+
+	const version = getVersion(lookupKey)
 	const name = framework.split('/')[1] || framework
 
 	if (version) {

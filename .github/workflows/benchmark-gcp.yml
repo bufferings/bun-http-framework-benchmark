@@ -73,39 +73,49 @@ jobs:
             - name: Install Node.js dependencies
               run: npm install
 
-            - name: Cache Deno dependencies
+            - name: Install oha
               run: |
-                  deno cache src/deno/hono.ts
-                  deno cache src/deno/kori.ts
+                  wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
+                  chmod +x oha-linux-amd64
+                  sudo mv oha-linux-amd64 /usr/local/bin/oha
 
-            - name: Run benchmark
+            - name: Run benchmarks
               run: |
                   ulimit -n 65535
                   TIME="${{ inputs.time || '30' }}"
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
-                  bun run bench.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+                  bun run scripts/bench-single.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
               env:
                   NODE_ENV: production
                   PLATFORM: GCP (bench-vm)
 
-            - name: Upload results
-              uses: actions/upload-artifact@v4
-              with:
-                  name: benchmark-results-gcp
-                  path: results/
-                  retention-days: 90
-              if: always()
+            - name: Generate report
+              run: bun run scripts/report.ts results/single.json docs/bench-single-gcp
+              if: success()
 
             - name: Display results
               run: |
-                  if [ -f results/results.md ] && [ -s results/results.md ]; then
-                    cat results/results.md >> $GITHUB_STEP_SUMMARY
+                  if [ -f docs/bench-single-gcp/README.md ] && [ -s docs/bench-single-gcp/README.md ]; then
+                    grep -v '!\[.*\](.*\.svg)' docs/bench-single-gcp/README.md >> $GITHUB_STEP_SUMMARY
                   else
                     echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
                   fi
               if: always()
+
+            - name: Commit and push results
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add docs/bench-single-gcp/
+                  if git diff --cached --quiet; then
+                    echo "No changes to commit"
+                  else
+                    git commit -m "Update benchmark results - $(date +%Y-%m-%d)"
+                    git push
+                  fi
+              if: success()
 
     stop-vm:
         name: Stop GCP VM

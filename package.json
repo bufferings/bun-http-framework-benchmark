@@ -1,9 +1,6 @@
 {
 	"name": "bun-http-framework-benchmark",
 	"scripts": {
-		"benchmark": "bun bench.ts",
-		"list-frameworks": "bun scripts/list-frameworks.ts",
-		"aggregate-results": "bun scripts/aggregate-results.ts",
 		"kill-port": "kill-port 3000"
 	},
 	"devDependencies": {

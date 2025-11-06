@@ -1,5 +1,5 @@
 {
 	"deno.enable": true,
-	"deno.enablePaths": ["./src/deno"],
+	"deno.enablePaths": ["./src/single/deno", "./src/multi/deno"],
 	"deno.config": "./deno.json"
 }

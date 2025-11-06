@@ -1,13 +1,16 @@
 import { readFileSync, writeFileSync } from 'fs'
 
-const resultsPath = 'results/results.md'
+const resultsPath = 'docs/bench-single/README.md'
 const readmePath = 'README.md'
 
 // Read current README
 let readme = readFileSync(readmePath, 'utf-8')
 
-// Read benchmark results (already includes environment info from bench.ts)
+// Read benchmark results
 let results = readFileSync(resultsPath, 'utf-8')
+
+// Fix SVG relative paths for root README
+results = results.replace(/!\[(.*?)\]\(\.\/chart-(.*?)\.svg\)/g, '![$1](./docs/bench-single/chart-$2.svg)')
 
 // Remove existing results section if present
 const startMarker = '<!-- START BENCHMARK RESULTS -->'
