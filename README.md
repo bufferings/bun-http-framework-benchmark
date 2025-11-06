@@ -20,20 +20,23 @@ Kori uses Hono's router internally, aiming to stay within ~10% overhead.
 
 ## Prerequisites
 
-- [bombardier](https://github.com/codesenberg/bombardier) - HTTP benchmarking tool
+- [oha](https://github.com/hatoo/oha) - HTTP benchmarking tool
 - Bun, Node.js, and/or Deno runtimes
 
 ## Usage
 
 ```bash
-# Run all benchmarks
-bun run benchmark
+# Run single-process benchmarks
+bun run scripts/bench-single.ts
 
-# Run specific frameworks (use runtime/framework format)
-bun bench.ts bun/kori node/kori
+# Run specific endpoints
+bun run scripts/bench-single.ts bun/kori deno/hono
 
 # Custom settings
-bun bench.ts bun/kori --time=10 --connections=64 --runs=3
+bun run scripts/bench-single.ts --time=10 --connections=100 --runs=3
+
+# Generate documentation
+bun run scripts/report.ts results/single.json docs/bench-single
 ```
 
 <!-- START BENCHMARK RESULTS -->
