@@ -1,46 +1,3 @@
-# Kori Framework Benchmarks
-
-> This repository is based on [SaltyAom/bun-http-framework-benchmark](https://github.com/SaltyAom/bun-http-framework-benchmark), adapted for Kori framework development.
-
-Performance benchmarks for [Kori](https://github.com/bufferings/kori) across Bun, Node.js, and Deno runtimes.
-
-Kori uses Hono's router internally, aiming to stay within ~10% overhead.
-
-## Benchmarks
-
-### Basic Benchmarks
-- **Ping** - `GET /` returns "Hi" (text/plain)
-- **Query** - `GET /id/:id?name=bun` extracts params and query (returns "1 bun")
-- **Body** - `POST /json` parses and mirrors JSON body
-
-### Validation Benchmarks
-- **Zod** - Request body validation using Zod schema
-- **Valibot** - Request body validation using Valibot schema
-- **ArkType** - Request body validation using ArkType schema
-
-## Prerequisites
-
-- [oha](https://github.com/hatoo/oha) - HTTP benchmarking tool
-- Bun, Node.js, and/or Deno runtimes
-
-## Usage
-
-```bash
-# Run single-process benchmarks
-bun run scripts/bench-single.ts
-
-# Run specific endpoints
-bun run scripts/bench-single.ts bun/kori deno/hono
-
-# Custom settings
-bun run scripts/bench-single.ts --time=10 --connections=100 --runs=3
-
-# Generate documentation
-bun run scripts/report.ts results/single.json docs/bench-single
-```
-
-<!-- START BENCHMARK RESULTS -->
-
 ## Single Process Benchmark Results
 
 Benchmark results for HTTP frameworks running in a single process.
@@ -63,13 +20,13 @@ Benchmark results for HTTP frameworks running in a single process.
 
 Overall comparison normalized to percentages. The fastest framework in each test = 100%.
 
-![Relative Performance](./docs/bench-single/chart-relative.svg)
+![Relative Performance](./chart-relative.svg)
 
 ### Absolute Performance (req/s)
 
 Shows the actual requests per second for each framework across all test cases.
 
-![Absolute Performance](./docs/bench-single/chart-absolute.svg)
+![Absolute Performance](./chart-absolute.svg)
 
 ### Benchmark Environment
 
@@ -88,6 +45,3 @@ Machine:
 | OS | linux 6.11.0-1018-azure |
 | CPU | AMD EPYC 7763 64-Core Processor (4 cores) |
 | Memory | 15.6GB |
-
-
-<!-- END BENCHMARK RESULTS -->

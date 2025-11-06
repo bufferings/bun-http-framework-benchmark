@@ -1,0 +1,504 @@
+{
+  "meta": {
+    "timestamp": "2025-11-06T18:49:08.052Z",
+    "benchmark": {
+      "tool": "oha",
+      "duration": 30,
+      "connections": 128,
+      "runs": 1
+    },
+    "environment": {
+      "platform": "linux",
+      "os": "linux 6.11.0-1018-azure",
+      "cpu": "AMD EPYC 7763 64-Core Processor (4 cores)",
+      "memory": "15.6GB",
+      "runtimes": {
+        "bun": "1.3.1",
+        "node": "22.21.1",
+        "deno": "2.5.6"
+      }
+    }
+  },
+  "benchmarks": [
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        47579.2728
+      ],
+      "median": 47579.2728
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        124439.124
+      ],
+      "median": 124439.124
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        59564.3138
+      ],
+      "median": 59564.3138
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        34006.3646
+      ],
+      "median": 34006.3646
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        32438.8311
+      ],
+      "median": 32438.8311
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        31539.3224
+      ],
+      "median": 31539.3224
+    },
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        38379.7762
+      ],
+      "median": 38379.7762
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        68729.9338
+      ],
+      "median": 68729.9338
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        50326.2918
+      ],
+      "median": 50326.2918
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        27652.6622
+      ],
+      "median": 27652.6622
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        27233.089
+      ],
+      "median": 27233.089
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        26797.6646
+      ],
+      "median": 26797.6646
+    },
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        47815.7414
+      ],
+      "median": 47815.7414
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        66572.5003
+      ],
+      "median": 66572.5003
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        51654.5533
+      ],
+      "median": 51654.5533
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        23338.0097
+      ],
+      "median": 23338.0097
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        22582.9409
+      ],
+      "median": 22582.9409
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        23510.9282
+      ],
+      "median": 23510.9282
+    },
+    {
+      "endpoint": "body",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        32040.5411
+      ],
+      "median": 32040.5411
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        68801.2611
+      ],
+      "median": 68801.2611
+    },
+    {
+      "endpoint": "query",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        40420.5778
+      ],
+      "median": 40420.5778
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        28085.8599
+      ],
+      "median": 28085.8599
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        26138.8906
+      ],
+      "median": 26138.8906
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        28786.8156
+      ],
+      "median": 28786.8156
+    },
+    {
+      "endpoint": "body",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        36837.432
+      ],
+      "median": 36837.432
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        56902.5653
+      ],
+      "median": 56902.5653
+    },
+    {
+      "endpoint": "query",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        51606.9509
+      ],
+      "median": 51606.9509
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        28496.5623
+      ],
+      "median": 28496.5623
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        28299.4172
+      ],
+      "median": 28299.4172
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        28159.6336
+      ],
+      "median": 28159.6336
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        5165.7648
+      ],
+      "median": 5165.7648
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        7370.5086
+      ],
+      "median": 7370.5086
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        6892.9336
+      ],
+      "median": 6892.9336
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        12862.8193
+      ],
+      "median": 12862.8193
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        26470.8165
+      ],
+      "median": 26470.8165
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        26101.6421
+      ],
+      "median": 26101.6421
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        8031.4774
+      ],
+      "median": 8031.4774
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        22106.782
+      ],
+      "median": 22106.782
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        19240.2153
+      ],
+      "median": 19240.2153
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7488.691
+      ],
+      "median": 7488.691
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7508.0115
+      ],
+      "median": 7508.0115
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7538.4919
+      ],
+      "median": 7538.4919
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        8661.1543
+      ],
+      "median": 8661.1543
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        19955.8828
+      ],
+      "median": 19955.8828
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        17670.1264
+      ],
+      "median": 17670.1264
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7768.2
+      ],
+      "median": 7768.2
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7677.0909
+      ],
+      "median": 7677.0909
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7729.8347
+      ],
+      "median": 7729.8347
+    }
+  ]
+}
