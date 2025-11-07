@@ -4,48 +4,131 @@ import {
 	stdRequestSchema
 } from '@korix/standard-schema-adapter'
 import { z } from 'zod'
-import * as v from 'valibot'
-import { type } from 'arktype'
 
-const zodSchema = z.object({
-	hello: z.string(),
-	count: z.number().int().positive(),
+// Validation schemas
+const uuidSchema = z.string().uuid()
+
+const numericIdSchema = z.coerce.number().int().positive()
+
+const paginationSchema = z.object({
+	page: z.coerce.number().int().min(1).default(1),
+	limit: z.coerce.number().int().min(1).max(100).default(10)
+})
+
+const postsQuerySchema = z.object({
+	userId: z.coerce.number().int().positive(),
+	page: z.coerce.number().int().min(1).default(1)
+})
+
+const userBodySchema = z.object({
+	name: z.string().min(1),
+	email: z.string().email(),
+	age: z.number().int().min(0).optional()
+})
+
+const postBodySchema = z.object({
+	title: z.string().min(1),
+	content: z.string().min(1),
 	tags: z.array(z.string()).optional()
 })
 
-const valibotSchema = v.object({
-	hello: v.string(),
-	count: v.pipe(v.number(), v.integer(), v.minValue(1)),
-	tags: v.optional(v.array(v.string()))
-})
-
-const arktypeSchema = type({
-	hello: 'string',
-	count: 'number>0',
-	'tags?': 'string[]'
+const commentBodySchema = z.object({
+	postId: z.string(),
+	content: z.string().min(1),
+	author: z.string().min(1)
 })
 
 const app = createKori({
 	...enableStdRequestValidation()
 })
 
-app.get('/', (c) => c.res.text('Hi'))
-	.get('/id/:id', (c) => {
-		c.res.setHeader('x-powered-by', 'benchmark')
-		return c.res.text(`${c.req.param('id')} ${c.req.query('name')}`)
-	})
-	.post('/json', (c) => c.req.bodyJson().then((body) => c.res.json(body)))
-	.post('/validate-zod', {
-		requestSchema: stdRequestSchema({ body: zodSchema }),
-		handler: (c) => c.res.json(c.req.validatedBody())
-	})
-	.post('/validate-valibot', {
-		requestSchema: stdRequestSchema({ body: valibotSchema }),
-		handler: (c) => c.res.json(c.req.validatedBody())
-	})
-	.post('/validate-arktype', {
-		requestSchema: stdRequestSchema({ body: arktypeSchema }),
-		handler: (c) => c.res.json(c.req.validatedBody())
-	})
+// 1. GET /api/users/:id
+app.get('/api/users/:id', {
+	requestSchema: stdRequestSchema({ params: z.object({ id: uuidSchema }) }),
+	handler: (c) => {
+		const { id } = c.req.validatedParams()
+		return c.res.json({ id, name: 'John Doe', email: 'john@example.com' })
+	}
+})
+
+// 2. GET /api/users
+app.get('/api/users', {
+	requestSchema: stdRequestSchema({ query: paginationSchema }),
+	handler: (c) => {
+		const { page, limit } = c.req.validatedQuery()
+		return c.res.json({ page, limit, users: [] })
+	}
+})
+
+// 3. POST /api/users
+app.post('/api/users', {
+	requestSchema: stdRequestSchema({ body: userBodySchema }),
+	handler: (c) => c.res.json(c.req.validatedBody())
+})
+
+// 4. PUT /api/users/:id
+app.put('/api/users/:id', {
+	requestSchema: stdRequestSchema({
+		params: z.object({ id: uuidSchema }),
+		body: userBodySchema
+	}),
+	handler: (c) => {
+		const { id } = c.req.validatedParams()
+		const body = c.req.validatedBody()
+		return c.res.json({ id, ...body })
+	}
+})
+
+// 5. DELETE /api/users/:id
+app.delete('/api/users/:id', {
+	requestSchema: stdRequestSchema({ params: z.object({ id: uuidSchema }) }),
+	handler: (c) => {
+		const { id } = c.req.validatedParams()
+		return c.res.json({ deleted: id })
+	}
+})
+
+// 6. GET /api/posts/:id
+app.get('/api/posts/:id', {
+	requestSchema: stdRequestSchema({ params: z.object({ id: numericIdSchema }) }),
+	handler: (c) => {
+		const { id } = c.req.validatedParams()
+		return c.res.json({ id, title: 'Test Post', content: 'Content' })
+	}
+})
+
+// 7. GET /api/posts
+app.get('/api/posts', {
+	requestSchema: stdRequestSchema({ query: postsQuerySchema }),
+	handler: (c) => {
+		const { userId, page } = c.req.validatedQuery()
+		return c.res.json({ userId, page, posts: [] })
+	}
+})
+
+// 8. POST /api/posts
+app.post('/api/posts', {
+	requestSchema: stdRequestSchema({ body: postBodySchema }),
+	handler: (c) => c.res.json(c.req.validatedBody())
+})
+
+// 9. PUT /api/posts/:id
+app.put('/api/posts/:id', {
+	requestSchema: stdRequestSchema({
+		params: z.object({ id: numericIdSchema }),
+		body: postBodySchema
+	}),
+	handler: (c) => {
+		const { id } = c.req.validatedParams()
+		const body = c.req.validatedBody()
+		return c.res.json({ id, ...body })
+	}
+})
+
+// 10. POST /api/comments
+app.post('/api/comments', {
+	requestSchema: stdRequestSchema({ body: commentBodySchema }),
+	handler: (c) => c.res.json(c.req.validatedBody())
+})
 
 Deno.serve({ port: 3000 }, (await app.generate().onStart()).fetchHandler)

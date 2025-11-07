@@ -425,7 +425,7 @@ const main = async () => {
 
 	writeFileSync('results/single-2vm.json', JSON.stringify(results, null, 2))
 	console.log('\nResults saved to results/single-2vm.json')
-	console.log('Run "bun scripts/report.ts results/single-2vm.json docs/bench-single-2vm" to generate documentation')
+	console.log('Run "bun scripts/report-single.ts results/single-2vm.json docs/bench-single-2vm" to generate documentation')
 }
 
 main()

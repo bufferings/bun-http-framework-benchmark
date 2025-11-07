@@ -356,7 +356,7 @@ const main = async () => {
 
 	writeFileSync('results/single.json', JSON.stringify(results, null, 2))
 	console.log('\nResults saved to results/single.json')
-	console.log('Run "bun scripts/report.ts results/single.json docs/bench-single" to generate documentation')
+	console.log('Run "bun scripts/report-single.ts results/single.json docs/bench-single" to generate documentation')
 }
 
 const getWarmupCommand = (endpointType: string) => {

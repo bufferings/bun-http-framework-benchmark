@@ -41,7 +41,7 @@ export const generateDocs = (results: Results, outputDir: string) => {
 	if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true })
 
 	// Prepare data
-	const testOrder = ['ping', 'query', 'body', 'validate-zod', 'validate-valibot', 'validate-arktype']
+	const testOrder = ['ping', 'query', 'body', 'validate-zod', 'validate-valibot', 'validate-arktype', 'validate-elysia-t']
 
 	// Create data map: framework -> endpoint -> median
 	const dataMap = new Map<string, Map<string, number>>()

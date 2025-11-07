@@ -1,7 +1,14 @@
 import { readFileSync, writeFileSync } from 'fs'
 
-const resultsPath = 'docs/bench-single/README.md'
+// Usage: bun scripts/append-results-to-readme.ts <docs-dir>
+// Example: bun scripts/append-results-to-readme.ts docs/bench-single-2vm
+const args = Bun.argv.slice(2)
+const docsDir = args[0] || 'docs/bench-single'
+
+const resultsPath = `${docsDir}/README.md`
 const readmePath = 'README.md'
+
+console.log(`Reading results from: ${resultsPath}`)
 
 // Read current README
 let readme = readFileSync(readmePath, 'utf-8')
@@ -10,7 +17,7 @@ let readme = readFileSync(readmePath, 'utf-8')
 let results = readFileSync(resultsPath, 'utf-8')
 
 // Fix SVG relative paths for root README
-results = results.replace(/!\[(.*?)\]\(\.\/chart-(.*?)\.svg\)/g, '![$1](./docs/bench-single/chart-$2.svg)')
+results = results.replace(/!\[(.*?)\]\(\.\/chart-(.*?)\.svg\)/g, `![$1](./${docsDir}/chart-$2.svg)`)
 
 // Remove existing results section if present
 const startMarker = '<!-- START BENCHMARK RESULTS -->'

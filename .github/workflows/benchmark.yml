@@ -18,6 +18,56 @@ on:
                 required: false
                 default: '1'
                 type: string
+            all:
+                description: 'Run all frameworks'
+                required: false
+                default: true
+                type: boolean
+            bun_kori:
+                description: 'Bun + Kori'
+                required: false
+                default: true
+                type: boolean
+            bun_hono:
+                description: 'Bun + Hono'
+                required: false
+                default: true
+                type: boolean
+            bun_elysia:
+                description: 'Bun + Elysia'
+                required: false
+                default: true
+                type: boolean
+            deno_kori:
+                description: 'Deno + Kori'
+                required: false
+                default: true
+                type: boolean
+            deno_hono:
+                description: 'Deno + Hono'
+                required: false
+                default: true
+                type: boolean
+            node_kori:
+                description: 'Node + Kori'
+                required: false
+                default: true
+                type: boolean
+            node_hono:
+                description: 'Node + Hono'
+                required: false
+                default: true
+                type: boolean
+            node_express:
+                description: 'Node + Express'
+                required: false
+                default: true
+                type: boolean
+            node_fastify:
+                description: 'Node + Fastify'
+                required: false
+                default: true
+                type: boolean
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -28,6 +78,9 @@ jobs:
         name: Run All Benchmarks
         runs-on: ubuntu-latest
         timeout-minutes: 120
+        permissions:
+            contents: write
+
         steps:
             - uses: actions/checkout@v4
 
@@ -58,6 +111,27 @@ jobs:
                   chmod +x oha-linux-amd64
                   sudo mv oha-linux-amd64 /usr/local/bin/oha
 
+            - name: Build endpoint list
+              run: |
+                  ENDPOINTS=""
+                  if [ "${{ inputs.all }}" == "true" ]; then
+                      echo "Running all frameworks"
+                      echo "ENDPOINTS=" >> $GITHUB_ENV
+                  else
+                      if [ "${{ inputs.bun_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/kori,"; fi
+                      if [ "${{ inputs.bun_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/hono,"; fi
+                      if [ "${{ inputs.bun_elysia }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/elysia,"; fi
+                      if [ "${{ inputs.deno_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}deno/kori,"; fi
+                      if [ "${{ inputs.deno_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}deno/hono,"; fi
+                      if [ "${{ inputs.node_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/kori,"; fi
+                      if [ "${{ inputs.node_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/hono,"; fi
+                      if [ "${{ inputs.node_express }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/express,"; fi
+                      if [ "${{ inputs.node_fastify }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/fastify,"; fi
+                      ENDPOINTS="${ENDPOINTS%,}"
+                      echo "Selected endpoints: $ENDPOINTS"
+                      echo "ENDPOINTS=$ENDPOINTS" >> $GITHUB_ENV
+                  fi
+
             - name: Run benchmarks
               run: |
                   ulimit -n 65535
@@ -65,13 +139,19 @@ jobs:
                   CONNECTIONS="${{ inputs.connections || '128' }}"
                   RUNS="${{ inputs.runs || '1' }}"
                   echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
+                  if [ -n "$ENDPOINTS" ]; then
+                      echo "Target endpoints: $ENDPOINTS"
+                  else
+                      echo "Running all endpoints"
+                  fi
                   bun run scripts/bench-single.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
               env:
                   NODE_ENV: production
                   PLATFORM: GitHub Actions (ubuntu-latest)
+                  ENDPOINTS: ${{ env.ENDPOINTS }}
 
             - name: Generate report
-              run: bun run scripts/report.ts results/single.json docs/bench-single
+              run: bun run scripts/report-single.ts results/single.json docs/bench-single
               if: success()
 
             - name: Display results
@@ -86,15 +166,11 @@ jobs:
                   fi
               if: always()
 
-            - name: Append results to README
-              run: bun run scripts/append-results-to-readme.ts
-              if: success()
-
             - name: Commit and push results
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git add docs/bench-single/ README.md
+                  git add docs/bench-single/
                   if git diff --cached --quiet; then
                     echo "No changes to commit"
                   else

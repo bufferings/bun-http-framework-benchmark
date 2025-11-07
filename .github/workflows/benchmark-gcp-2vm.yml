@@ -18,6 +18,56 @@ on:
                 required: false
                 default: '1'
                 type: string
+            all:
+                description: '🌟 ALL Frameworks (overrides individual selections)'
+                required: false
+                default: true
+                type: boolean
+            bun_kori:
+                description: 'Bun + Kori'
+                required: false
+                default: true
+                type: boolean
+            bun_hono:
+                description: 'Bun + Hono'
+                required: false
+                default: true
+                type: boolean
+            bun_elysia:
+                description: 'Bun + Elysia'
+                required: false
+                default: true
+                type: boolean
+            deno_kori:
+                description: 'Deno + Kori'
+                required: false
+                default: true
+                type: boolean
+            deno_hono:
+                description: 'Deno + Hono'
+                required: false
+                default: true
+                type: boolean
+            node_kori:
+                description: 'Node + Kori'
+                required: false
+                default: true
+                type: boolean
+            node_hono:
+                description: 'Node + Hono'
+                required: false
+                default: true
+                type: boolean
+            node_express:
+                description: 'Node + Express'
+                required: false
+                default: true
+                type: boolean
+            node_fastify:
+                description: 'Node + Fastify'
+                required: false
+                default: true
+                type: boolean
 
 concurrency:
     group: benchmark-gcp-2vm
@@ -71,16 +121,18 @@ jobs:
         needs: start-vms
         runs-on: [self-hosted, bench-vm-load]
         timeout-minutes: 120
+        permissions:
+            contents: write
 
         steps:
+            - uses: actions/checkout@v4
+
             - name: Install git
               run: |
                   if ! command -v git &> /dev/null; then
                       sudo apt-get update
                       sudo apt-get install -y git
                   fi
-
-            - uses: actions/checkout@v4
 
             - name: Authenticate to Google Cloud
               uses: google-github-actions/auth@v3
@@ -104,6 +156,27 @@ jobs:
                   chmod +x oha-linux-amd64
                   sudo mv oha-linux-amd64 /usr/local/bin/oha
 
+            - name: Build endpoint list
+              run: |
+                  ENDPOINTS=""
+                  if [ "${{ inputs.all }}" == "true" ]; then
+                    echo "🌟 Running ALL frameworks"
+                    ENDPOINTS=""
+                  else
+                    if [ "${{ inputs.bun_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/kori,"; fi
+                    if [ "${{ inputs.bun_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/hono,"; fi
+                    if [ "${{ inputs.bun_elysia }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}bun/elysia,"; fi
+                    if [ "${{ inputs.deno_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}deno/kori,"; fi
+                    if [ "${{ inputs.deno_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}deno/hono,"; fi
+                    if [ "${{ inputs.node_kori }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/kori,"; fi
+                    if [ "${{ inputs.node_hono }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/hono,"; fi
+                    if [ "${{ inputs.node_express }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/express,"; fi
+                    if [ "${{ inputs.node_fastify }}" == "true" ]; then ENDPOINTS="${ENDPOINTS}node/fastify,"; fi
+                    ENDPOINTS=${ENDPOINTS%,}
+                  fi
+                  echo "ENDPOINTS=$ENDPOINTS" >> $GITHUB_ENV
+                  echo "Selected endpoints: $ENDPOINTS"
+
             - name: Run benchmark
               run: |
                   TIME="${{ inputs.time || '30' }}"
@@ -118,9 +191,10 @@ jobs:
                   GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}
                   GCP_ZONE: ${{ env.GCP_ZONE }}
                   PLATFORM: GCP (2-VM)
+                  ENDPOINTS: ${{ env.ENDPOINTS }}
 
             - name: Generate report
-              run: bun run scripts/report.ts results/single-2vm.json docs/bench-single-2vm
+              run: bun run scripts/report-single.ts results/single-2vm.json docs/bench-single-2vm
               if: success()
 
             - name: Display results
@@ -135,11 +209,15 @@ jobs:
                   fi
               if: always()
 
+            - name: Append results to README
+              run: bun run scripts/append-results-to-readme.ts docs/bench-single-2vm
+              if: success()
+
             - name: Commit and push results
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git add docs/bench-single-2vm/
+                  git add docs/bench-single-2vm/ README.md
                   if git diff --cached --quiet; then
                     echo "No changes to commit"
                   else
