@@ -72,6 +72,7 @@ jobs:
         runs-on: [self-hosted, bench-vm-load]
         timeout-minutes: 180
         permissions:
+            id-token: write
             contents: write
 
         steps:
@@ -134,11 +135,15 @@ jobs:
                   fi
               if: always()
 
+            - name: Append results to README
+              run: bun run scripts/append-results-to-readme.ts docs/bench-multi-2vm multi
+              if: success()
+
             - name: Commit and push results
               run: |
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git add docs/bench-multi-2vm/
+                  git add docs/bench-multi-2vm/ README.md
                   if git diff --cached --quiet; then
                     echo "No changes to commit"
                   else

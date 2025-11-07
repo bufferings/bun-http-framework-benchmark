@@ -72,6 +72,7 @@ jobs:
         runs-on: [self-hosted, bench-vm-load]
         timeout-minutes: 120
         permissions:
+            id-token: write
             contents: write
 
         steps:
@@ -138,7 +139,7 @@ jobs:
               if: always()
 
             - name: Append results to README
-              run: bun run scripts/append-results-to-readme.ts docs/bench-single-2vm
+              run: bun run scripts/append-results-to-readme.ts docs/bench-single-2vm single
               if: success()
 
             - name: Commit and push results

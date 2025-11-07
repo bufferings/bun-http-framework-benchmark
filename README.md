@@ -39,7 +39,7 @@ bun run scripts/bench-single.ts --time=10 --connections=100 --runs=3
 bun run scripts/report.ts results/single.json docs/bench-single
 ```
 
-<!-- START BENCHMARK RESULTS -->
+<!-- START BENCHMARK SINGLE RESULTS -->
 
 ## Single Process Benchmark Results
 
@@ -90,4 +90,8 @@ Machine:
 | Memory | 15.6GB |
 
 
-<!-- END BENCHMARK RESULTS -->
+<!-- END BENCHMARK SINGLE RESULTS -->
+
+<!-- START BENCHMARK MULTI RESULTS -->
+
+<!-- END BENCHMARK MULTI RESULTS -->
