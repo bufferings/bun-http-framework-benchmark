@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2025-11-07T13:42:47.644Z",
+    "timestamp": "2025-11-07T15:56:50.568Z",
     "benchmark": {
       "tool": "oha",
       "duration": 30,
@@ -10,7 +10,7 @@
     "environment": {
       "platform": "linux",
       "os": "linux 6.11.0-1018-azure",
-      "cpu": "AMD EPYC 7763 64-Core Processor (4 cores)",
+      "cpu": "Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz (4 cores)",
       "memory": "15.6GB",
       "runtimes": {
         "bun": "1.3.1",
@@ -26,11 +26,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        52956.743,
-        54501.1638,
-        54537.1217
+        73135.0335,
+        78036.7826,
+        82317.5311
       ],
-      "median": 54501.1638
+      "median": 78036.7826
     },
     {
       "endpoint": "ping",
@@ -38,11 +38,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        123073.8851,
-        123433.31,
-        123832.002
+        165862.949,
+        166187.2014,
+        167403.6387
       ],
-      "median": 123433.31
+      "median": 166187.2014
     },
     {
       "endpoint": "query",
@@ -50,11 +50,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        62881.3546,
-        65478.4976,
-        68214.4248
+        93062.7393,
+        94997.9031,
+        95417.364
       ],
-      "median": 65478.4976
+      "median": 94997.9031
     },
     {
       "endpoint": "validate-arktype",
@@ -62,11 +62,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        33766.3738,
-        34839.8425,
-        36560.2454
+        48766.4133,
+        53243.1355,
+        54214.2975
       ],
-      "median": 34839.8425
+      "median": 53243.1355
     },
     {
       "endpoint": "validate-valibot",
@@ -74,11 +74,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        36541.7294,
-        36969.7198,
-        37944.8284
+        53671.7073,
+        54686.9129,
+        54774.141
       ],
-      "median": 36969.7198
+      "median": 54686.9129
     },
     {
       "endpoint": "validate-zod",
@@ -86,11 +86,11 @@
       "framework": "elysia",
       "displayName": "elysia@1.4.13",
       "results": [
-        33188.2637,
-        36209.6278,
-        36959.6649
+        51588.4188,
+        53240.4209,
+        55198.7988
       ],
-      "median": 36209.6278
+      "median": 53240.4209
     },
     {
       "endpoint": "body",
@@ -98,11 +98,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        40584.5058,
-        40784.6732,
-        42825.515
+        58487.3818,
+        58525.9874,
+        60778.4981
       ],
-      "median": 40784.6732
+      "median": 58525.9874
     },
     {
       "endpoint": "ping",
@@ -110,11 +110,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        72618.5923,
-        74040.3083,
-        75165.8424
+        98147.3446,
+        98944.3872,
+        104230.1396
       ],
-      "median": 74040.3083
+      "median": 98944.3872
     },
     {
       "endpoint": "query",
@@ -122,11 +122,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        51813.8522,
-        52674.9756,
-        53533.52
+        70706.7321,
+        74447.5552,
+        76507.8369
       ],
-      "median": 52674.9756
+      "median": 74447.5552
     },
     {
       "endpoint": "validate-arktype",
@@ -134,11 +134,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        25366.8093,
-        28886.3434,
-        29991.4674
+        41910.72,
+        42418.4108,
+        43783.1544
       ],
-      "median": 28886.3434
+      "median": 42418.4108
     },
     {
       "endpoint": "validate-valibot",
@@ -146,11 +146,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        27043.335,
-        28742.6593,
-        29496.2436
+        43455.095,
+        43574.5653,
+        43834.8448
       ],
-      "median": 28742.6593
+      "median": 43574.5653
     },
     {
       "endpoint": "validate-zod",
@@ -158,11 +158,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        28616.2805,
-        29985.8148,
-        29999.3146
+        41025.2066,
+        43356.0796,
+        43472.0688
       ],
-      "median": 29985.8148
+      "median": 43356.0796
     },
     {
       "endpoint": "body",
@@ -170,11 +170,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        45604.5504,
-        46984.1541,
-        48909.7575
+        69606.6571,
+        71202.8058,
+        75254.3865
       ],
-      "median": 46984.1541
+      "median": 71202.8058
     },
     {
       "endpoint": "ping",
@@ -182,11 +182,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        62270.8508,
-        67929.5565,
-        69345.1827
+        94658.2905,
+        94796.4289,
+        95647.3903
       ],
-      "median": 67929.5565
+      "median": 94796.4289
     },
     {
       "endpoint": "query",
@@ -194,11 +194,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        52923.0484,
-        53269.2333,
-        58293.281
+        76805.9478,
+        79004.8883,
+        80631.6378
       ],
-      "median": 53269.2333
+      "median": 79004.8883
     },
     {
       "endpoint": "validate-arktype",
@@ -206,11 +206,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        24557.4432,
-        24990.682,
-        25308.0567
+        34000.5142,
+        35590.3803,
+        35834.0099
       ],
-      "median": 24990.682
+      "median": 35590.3803
     },
     {
       "endpoint": "validate-valibot",
@@ -218,11 +218,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        23415.168,
-        25646.5862,
-        25688.1658
+        36246.5319,
+        36812.7117,
+        38366.8714
       ],
-      "median": 25646.5862
+      "median": 36812.7117
     },
     {
       "endpoint": "validate-zod",
@@ -230,11 +230,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        24666.567,
-        24966.8589,
-        25088.7261
+        35882.8621,
+        36317.3566,
+        36871.5668
       ],
-      "median": 24966.8589
+      "median": 36317.3566
     },
     {
       "endpoint": "body",
@@ -242,11 +242,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        33211.2272,
-        33587.8783,
-        34017.7696
+        38964.6584,
+        39053.9688,
+        40623.2661
       ],
-      "median": 33587.8783
+      "median": 39053.9688
     },
     {
       "endpoint": "ping",
@@ -254,11 +254,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        66224.8275,
-        66508.2135,
-        68325.8973
+        88265.1973,
+        90165.0923,
+        92651.783
       ],
-      "median": 66508.2135
+      "median": 90165.0923
     },
     {
       "endpoint": "query",
@@ -266,11 +266,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        42570.5934,
-        43591.6387,
-        46445.7574
+        54904.7411,
+        56380.4489,
+        56616.6408
       ],
-      "median": 43591.6387
+      "median": 56380.4489
     },
     {
       "endpoint": "validate-arktype",
@@ -278,11 +278,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        30366.3216,
-        30736.6372,
-        31152.6871
+        34588.9352,
+        35216.9498,
+        35276.1194
       ],
-      "median": 30736.6372
+      "median": 35216.9498
     },
     {
       "endpoint": "validate-valibot",
@@ -290,11 +290,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        28660.3698,
-        28959.6395,
-        29049.5936
+        32656.8305,
+        33308.0309,
+        33365.9862
       ],
-      "median": 28959.6395
+      "median": 33308.0309
     },
     {
       "endpoint": "validate-zod",
@@ -302,11 +302,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        30828.5406,
-        31314.1844,
-        31581.0381
+        34227.6812,
+        34405.0629,
+        34642.7678
       ],
-      "median": 31314.1844
+      "median": 34405.0629
     },
     {
       "endpoint": "body",
@@ -314,11 +314,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        38889.7457,
-        40010.2993,
-        41258.5971
+        49405.0142,
+        49555.1677,
+        50508.4684
       ],
-      "median": 40010.2993
+      "median": 49555.1677
     },
     {
       "endpoint": "ping",
@@ -326,11 +326,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        56456.2413,
-        57501.1939,
-        59889.8664
+        75440.6734,
+        79961.175,
+        80523.0865
       ],
-      "median": 57501.1939
+      "median": 79961.175
     },
     {
       "endpoint": "query",
@@ -338,11 +338,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        52040.3395,
-        52719.574,
-        53073.9743
+        67389.8119,
+        67652.2237,
+        69133.1477
       ],
-      "median": 52719.574
+      "median": 67652.2237
     },
     {
       "endpoint": "validate-arktype",
@@ -350,11 +350,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        29693.1612,
-        30088.7871,
-        30566.5696
+        34468.9678,
+        34829.7954,
+        34865.4597
       ],
-      "median": 30088.7871
+      "median": 34829.7954
     },
     {
       "endpoint": "validate-valibot",
@@ -362,11 +362,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        30141.831,
-        30692.206,
-        30905.6411
+        33108.193,
+        33839.2349,
+        34146.2332
       ],
-      "median": 30692.206
+      "median": 33839.2349
     },
     {
       "endpoint": "validate-zod",
@@ -374,11 +374,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        30876.4432,
-        30923.63,
-        31100.7576
+        35036.332,
+        35167.1523,
+        35433.6062
       ],
-      "median": 30923.63
+      "median": 35167.1523
     },
     {
       "endpoint": "body",
@@ -386,11 +386,11 @@
       "framework": "express",
       "displayName": "express@5.1.0",
       "results": [
-        5275.375,
-        5334.0189,
-        5361.0971
+        6791.6365,
+        6966.4456,
+        7013.746
       ],
-      "median": 5334.0189
+      "median": 6966.4456
     },
     {
       "endpoint": "ping",
@@ -398,11 +398,11 @@
       "framework": "express",
       "displayName": "express@5.1.0",
       "results": [
-        7549.2684,
-        7584.2345,
-        7584.8817
+        9869.0464,
+        10233.4391,
+        10260.5392
       ],
-      "median": 7584.2345
+      "median": 10233.4391
     },
     {
       "endpoint": "query",
@@ -410,11 +410,11 @@
       "framework": "express",
       "displayName": "express@5.1.0",
       "results": [
-        7088.712,
-        7112.9609,
-        7163.5913
+        9534.9052,
+        9539.3523,
+        9569.424
       ],
-      "median": 7112.9609
+      "median": 9539.3523
     },
     {
       "endpoint": "body",
@@ -422,11 +422,11 @@
       "framework": "fastify",
       "displayName": "fastify@5.3.2",
       "results": [
-        13431.5992,
-        13436.5043,
-        13573.2706
+        20878.9405,
+        21431.7563,
+        21662.0782
       ],
-      "median": 13436.5043
+      "median": 21431.7563
     },
     {
       "endpoint": "ping",
@@ -434,11 +434,11 @@
       "framework": "fastify",
       "displayName": "fastify@5.3.2",
       "results": [
-        26486.4513,
-        26714.3477,
-        26937.6066
+        42472.5279,
+        44930.0986,
+        45045.3236
       ],
-      "median": 26714.3477
+      "median": 44930.0986
     },
     {
       "endpoint": "query",
@@ -446,11 +446,11 @@
       "framework": "fastify",
       "displayName": "fastify@5.3.2",
       "results": [
-        22776.4476,
-        24021.5227,
-        24639.2866
+        39963.4812,
+        41777.9273,
+        43425.8608
       ],
-      "median": 24021.5227
+      "median": 41777.9273
     },
     {
       "endpoint": "body",
@@ -458,11 +458,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        8096.9797,
-        8143.5331,
-        8345.3648
+        11059.0857,
+        11384.0989,
+        11568.0943
       ],
-      "median": 8143.5331
+      "median": 11384.0989
     },
     {
       "endpoint": "ping",
@@ -470,11 +470,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        22123.1912,
-        22689.4704,
-        22690.8658
+        37829.0001,
+        38092.8005,
+        39009.8044
       ],
-      "median": 22689.4704
+      "median": 38092.8005
     },
     {
       "endpoint": "query",
@@ -482,11 +482,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        19107.8558,
-        19127.805,
-        19270.2352
+        31324.3164,
+        31372.2159,
+        31527.9006
       ],
-      "median": 19127.805
+      "median": 31372.2159
     },
     {
       "endpoint": "validate-arktype",
@@ -494,11 +494,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        7530.2408,
-        7592.0369,
-        7650.2379
+        10524.6494,
+        10724.9671,
+        10922.5353
       ],
-      "median": 7592.0369
+      "median": 10724.9671
     },
     {
       "endpoint": "validate-valibot",
@@ -506,11 +506,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        7373.4321,
-        7419.4693,
-        7528.0782
+        10433.5661,
+        10602.9538,
+        10686.1801
       ],
-      "median": 7419.4693
+      "median": 10602.9538
     },
     {
       "endpoint": "validate-zod",
@@ -518,11 +518,11 @@
       "framework": "hono",
       "displayName": "hono@4.10.2",
       "results": [
-        7567.5636,
-        7624.4809,
-        7696.6445
+        10546.3079,
+        10692.3837,
+        10694.9704
       ],
-      "median": 7624.4809
+      "median": 10692.3837
     },
     {
       "endpoint": "body",
@@ -530,11 +530,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        9122.4023,
-        9143.2783,
-        9184.3944
+        12835.3676,
+        13042.5094,
+        13431.2853
       ],
-      "median": 9143.2783
+      "median": 13042.5094
     },
     {
       "endpoint": "ping",
@@ -542,11 +542,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        20466.296,
-        20733.7702,
-        20987.0046
+        34310.037,
+        35235.7237,
+        36109.6295
       ],
-      "median": 20733.7702
+      "median": 35235.7237
     },
     {
       "endpoint": "query",
@@ -554,11 +554,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        18362.0756,
-        18485.3144,
-        18793.4015
+        30151.4566,
+        30497.6939,
+        31577.4346
       ],
-      "median": 18485.3144
+      "median": 30497.6939
     },
     {
       "endpoint": "validate-arktype",
@@ -566,11 +566,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        7893.4779,
-        7923.0312,
-        7964.4308
+        10846.2827,
+        11064.1079,
+        11134.2562
       ],
-      "median": 7923.0312
+      "median": 11064.1079
     },
     {
       "endpoint": "validate-valibot",
@@ -578,11 +578,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        7696.2908,
-        7855.1334,
-        7880.3536
+        10790.1247,
+        11252.3131,
+        11333.7286
       ],
-      "median": 7855.1334
+      "median": 11252.3131
     },
     {
       "endpoint": "validate-zod",
@@ -590,11 +590,11 @@
       "framework": "kori",
       "displayName": "kori@0.3.4",
       "results": [
-        7831.4383,
-        7836.2129,
-        7887.5837
+        11086.3776,
+        11098.3519,
+        11398.7877
       ],
-      "median": 7836.2129
+      "median": 11098.3519
     }
   ]
 }
