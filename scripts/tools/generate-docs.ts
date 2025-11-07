@@ -79,13 +79,48 @@ const generateRelativeSVG = (
 	outputDir: string
 ) => {
 	const width = 1000
-	const height = 600
 	const chartLeft = 80
 	const chartRight = 920
 	const chartTop = 60
 	const chartBottom = 400
 	const chartWidth = chartRight - chartLeft
 	const chartHeight = chartBottom - chartTop
+
+	// Calculate legend dimensions
+	const maxLegendWidth = 800
+	const itemWidth = 150
+	const lineHeight = 20
+	
+	// Group frameworks by runtime
+	const frameworksByRuntime = new Map<string, string[]>()
+	frameworks.forEach(fw => {
+		const runtime = fw.split('/')[0]
+		if (!frameworksByRuntime.has(runtime)) {
+			frameworksByRuntime.set(runtime, [])
+		}
+		frameworksByRuntime.get(runtime)!.push(fw)
+	})
+
+	// Calculate legend height (number of lines)
+	let legendLines = 0
+	let currentLineWidth = 0
+	frameworksByRuntime.forEach((runtimeFrameworks) => {
+		runtimeFrameworks.forEach(fw => {
+			if (currentLineWidth + itemWidth > maxLegendWidth && currentLineWidth > 0) {
+				legendLines++
+				currentLineWidth = itemWidth
+			} else {
+				currentLineWidth += itemWidth
+			}
+		})
+		legendLines++ // Add line for this runtime group
+		currentLineWidth = 0 // Reset for next runtime group
+	})
+
+	const legendHeight = legendLines * lineHeight
+	const legendTop = chartBottom + 60 // Space below chart
+	const legendBottom = legendTop + legendHeight
+	const height = legendBottom + 20 // Add bottom margin
 
 	// Calculate relative performance
 	const relativeData = new Map<string, (number | null)[]>()
@@ -227,31 +262,40 @@ const generateRelativeSVG = (
 	}
 
 	// Legend
-	svg += `\n  <!-- Legend -->\n  <g transform="translate(100, 460)">\n`
+	svg += `\n  <!-- Legend -->\n  <g transform="translate(100, ${legendTop})">\n`
 	let legendX = 0
 	let legendY = 0
-	const itemsPerRow = 3
-	frameworks.forEach((fw, idx) => {
-		if (idx > 0 && idx % itemsPerRow === 0) {
-			legendX = 0
-			legendY += 20
-		}
-		const color = getColor(fw)
-		const markerClass = getMarkerClass(fw)
 
-		if (markerClass === 'circle') {
-			svg += `    <circle class="marker" cx="${legendX}" cy="${legendY}" r="7" stroke="${color}"/>\n`
-		} else if (markerClass === 'rect') {
-			svg += `    <rect class="marker" x="${legendX - 7}" y="${legendY - 7}" width="14" height="14" stroke="${color}"/>\n`
-		} else if (markerClass === 'triangle') {
-			const x1 = legendX, y1 = legendY - 8
-			const x2 = legendX - 7, y2 = legendY + 6
-			const x3 = legendX + 7, y3 = legendY + 6
-			svg += `    <polygon class="marker" points="${x1},${y1} ${x2},${y2} ${x3},${y3}" stroke="${color}"/>\n`
-		}
-		svg += `    <text class="label" x="${legendX + 15}" y="${legendY + 5}" font-size="14">${fw}</text>\n`
+	// Render legend grouped by runtime
+	frameworksByRuntime.forEach((runtimeFrameworks, runtime) => {
+		runtimeFrameworks.forEach(fw => {
+			// Check if we need to wrap to next line within this runtime group
+			if (legendX + itemWidth > maxLegendWidth && legendX > 0) {
+				legendX = 0
+				legendY += lineHeight
+			}
+			
+			const color = getColor(fw)
+			const markerClass = getMarkerClass(fw)
 
-		legendX += 150
+			if (markerClass === 'circle') {
+				svg += `    <circle class="marker" cx="${legendX}" cy="${legendY}" r="7" stroke="${color}"/>\n`
+			} else if (markerClass === 'rect') {
+				svg += `    <rect class="marker" x="${legendX - 7}" y="${legendY - 7}" width="14" height="14" stroke="${color}"/>\n`
+			} else if (markerClass === 'triangle') {
+				const x1 = legendX, y1 = legendY - 8
+				const x2 = legendX - 7, y2 = legendY + 6
+				const x3 = legendX + 7, y3 = legendY + 6
+				svg += `    <polygon class="marker" points="${x1},${y1} ${x2},${y2} ${x3},${y3}" stroke="${color}"/>\n`
+			}
+			svg += `    <text class="label" x="${legendX + 15}" y="${legendY + 5}" font-size="14">${fw}</text>\n`
+
+			legendX += itemWidth
+		})
+		
+		// Move to next line for next runtime group
+		legendX = 0
+		legendY += lineHeight
 	})
 	svg += `  </g>\n</svg>`
 
@@ -265,13 +309,48 @@ const generateAbsoluteSVG = (
 	outputDir: string
 ) => {
 	const width = 1000
-	const height = 600
 	const chartLeft = 80
 	const chartRight = 920
 	const chartTop = 60
 	const chartBottom = 400
 	const chartWidth = chartRight - chartLeft
 	const chartHeight = chartBottom - chartTop
+
+	// Calculate legend dimensions
+	const maxLegendWidth = 800
+	const itemWidth = 150
+	const lineHeight = 20
+	
+	// Group frameworks by runtime
+	const frameworksByRuntime = new Map<string, string[]>()
+	frameworks.forEach(fw => {
+		const runtime = fw.split('/')[0]
+		if (!frameworksByRuntime.has(runtime)) {
+			frameworksByRuntime.set(runtime, [])
+		}
+		frameworksByRuntime.get(runtime)!.push(fw)
+	})
+
+	// Calculate legend height (number of lines)
+	let legendLines = 0
+	let currentLineWidth = 0
+	frameworksByRuntime.forEach((runtimeFrameworks) => {
+		runtimeFrameworks.forEach(fw => {
+			if (currentLineWidth + itemWidth > maxLegendWidth && currentLineWidth > 0) {
+				legendLines++
+				currentLineWidth = itemWidth
+			} else {
+				currentLineWidth += itemWidth
+			}
+		})
+		legendLines++ // Add line for this runtime group
+		currentLineWidth = 0 // Reset for next runtime group
+	})
+
+	const legendHeight = legendLines * lineHeight
+	const legendTop = chartBottom + 60 // Space below chart
+	const legendBottom = legendTop + legendHeight
+	const height = legendBottom + 20 // Add bottom margin
 
 	// Find max value for scaling
 	let maxVal = 0
@@ -412,31 +491,40 @@ const generateAbsoluteSVG = (
 	}
 
 	// Legend
-	svg += `\n  <!-- Legend -->\n  <g transform="translate(100, 460)">\n`
+	svg += `\n  <!-- Legend -->\n  <g transform="translate(100, ${legendTop})">\n`
 	let legendX = 0
 	let legendY = 0
-	const itemsPerRow = 3
-	frameworks.forEach((fw, idx) => {
-		if (idx > 0 && idx % itemsPerRow === 0) {
-			legendX = 0
-			legendY += 20
-		}
-		const color = getColor(fw)
-		const markerClass = getMarkerClass(fw)
 
-		if (markerClass === 'circle') {
-			svg += `    <circle class="marker" cx="${legendX}" cy="${legendY}" r="7" stroke="${color}"/>\n`
-		} else if (markerClass === 'rect') {
-			svg += `    <rect class="marker" x="${legendX - 7}" y="${legendY - 7}" width="14" height="14" stroke="${color}"/>\n`
-		} else if (markerClass === 'triangle') {
-			const x1 = legendX, y1 = legendY - 8
-			const x2 = legendX - 7, y2 = legendY + 6
-			const x3 = legendX + 7, y3 = legendY + 6
-			svg += `    <polygon class="marker" points="${x1},${y1} ${x2},${y2} ${x3},${y3}" stroke="${color}"/>\n`
-		}
-		svg += `    <text class="label" x="${legendX + 15}" y="${legendY + 5}" font-size="14">${fw}</text>\n`
+	// Render legend grouped by runtime
+	frameworksByRuntime.forEach((runtimeFrameworks, runtime) => {
+		runtimeFrameworks.forEach(fw => {
+			// Check if we need to wrap to next line within this runtime group
+			if (legendX + itemWidth > maxLegendWidth && legendX > 0) {
+				legendX = 0
+				legendY += lineHeight
+			}
+			
+			const color = getColor(fw)
+			const markerClass = getMarkerClass(fw)
 
-		legendX += 150
+			if (markerClass === 'circle') {
+				svg += `    <circle class="marker" cx="${legendX}" cy="${legendY}" r="7" stroke="${color}"/>\n`
+			} else if (markerClass === 'rect') {
+				svg += `    <rect class="marker" x="${legendX - 7}" y="${legendY - 7}" width="14" height="14" stroke="${color}"/>\n`
+			} else if (markerClass === 'triangle') {
+				const x1 = legendX, y1 = legendY - 8
+				const x2 = legendX - 7, y2 = legendY + 6
+				const x3 = legendX + 7, y3 = legendY + 6
+				svg += `    <polygon class="marker" points="${x1},${y1} ${x2},${y2} ${x3},${y3}" stroke="${color}"/>\n`
+			}
+			svg += `    <text class="label" x="${legendX + 15}" y="${legendY + 5}" font-size="14">${fw}</text>\n`
+
+			legendX += itemWidth
+		})
+		
+		// Move to next line for next runtime group
+		legendX = 0
+		legendY += lineHeight
 	})
 	svg += `  </g>\n</svg>`
 
