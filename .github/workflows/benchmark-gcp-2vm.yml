@@ -151,6 +151,7 @@ jobs:
                     echo "No changes to commit"
                   else
                     git commit -m "Update benchmark results - $(date +%Y-%m-%d)"
+                    git pull --rebase origin main
                     git push
                   fi
               if: success()
