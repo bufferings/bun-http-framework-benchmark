@@ -1,6 +1,6 @@
 {
   "meta": {
-    "timestamp": "2025-11-07T17:09:20.758Z",
+    "timestamp": "2025-11-07T17:34:57.835Z",
     "benchmark": {
       "tool": "oha",
       "duration": 5,
@@ -27,66 +27,66 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            57345.8389
+            58970.2053
           ],
-          "median": 57345.8389
+          "median": 58970.2053
         },
         "GET /api/users": {
           "results": [
-            42215.7874
+            43363.9644
           ],
-          "median": 42215.7874
+          "median": 43363.9644
         },
         "POST /api/users": {
           "results": [
-            31170.8244
+            38162.8841
           ],
-          "median": 31170.8244
+          "median": 38162.8841
         },
         "PUT /api/users/:id": {
           "results": [
-            32819.0733
+            27909.4906
           ],
-          "median": 32819.0733
+          "median": 27909.4906
         },
         "DELETE /api/users/:id": {
           "results": [
-            70642.0726
+            67745.8272
           ],
-          "median": 70642.0726
+          "median": 67745.8272
         },
         "GET /api/posts/:id": {
           "results": [
-            61544.3665
+            64439.9511
           ],
-          "median": 61544.3665
+          "median": 64439.9511
         },
         "GET /api/posts": {
           "results": [
-            47296.5668
+            49217.3718
           ],
-          "median": 47296.5668
+          "median": 49217.3718
         },
         "POST /api/posts": {
           "results": [
-            30232.3326
+            35679.5975
           ],
-          "median": 30232.3326
+          "median": 35679.5975
         },
         "PUT /api/posts/:id": {
           "results": [
-            30414.5663
+            27410.1316
           ],
-          "median": 30414.5663
+          "median": 27410.1316
         },
         "POST /api/comments": {
           "results": [
-            37527.6208
+            38677.9687
           ],
-          "median": 37527.6208
+          "median": 38677.9687
         }
       },
-      "average": 44120.90496
+      "average": 45157.73923000001
     },
     {
       "runtime": "bun",
@@ -95,66 +95,66 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            34833.1474
+            31097.999
           ],
-          "median": 34833.1474
+          "median": 31097.999
         },
         "GET /api/users": {
           "results": [
-            33247.1882
+            30653.2691
           ],
-          "median": 33247.1882
+          "median": 30653.2691
         },
         "POST /api/users": {
           "results": [
-            26647.5612
+            26368.0368
           ],
-          "median": 26647.5612
+          "median": 26368.0368
         },
         "PUT /api/users/:id": {
           "results": [
-            23149.309
+            20511.2519
           ],
-          "median": 23149.309
+          "median": 20511.2519
         },
         "DELETE /api/users/:id": {
           "results": [
-            33417.651
+            34654.8259
           ],
-          "median": 33417.651
+          "median": 34654.8259
         },
         "GET /api/posts/:id": {
           "results": [
-            27841.8747
+            33049.5595
           ],
-          "median": 27841.8747
+          "median": 33049.5595
         },
         "GET /api/posts": {
           "results": [
-            31967.8849
+            32463.0146
           ],
-          "median": 31967.8849
+          "median": 32463.0146
         },
         "POST /api/posts": {
           "results": [
-            25813.8288
+            24713.2254
           ],
-          "median": 25813.8288
+          "median": 24713.2254
         },
         "PUT /api/posts/:id": {
           "results": [
-            20951.5396
+            22028.5474
           ],
-          "median": 20951.5396
+          "median": 22028.5474
         },
         "POST /api/comments": {
           "results": [
-            25726.235
+            26770.1828
           ],
-          "median": 25726.235
+          "median": 26770.1828
         }
       },
-      "average": 28359.621979999996
+      "average": 28230.991240000003
     },
     {
       "runtime": "bun",
@@ -163,66 +163,66 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            32046.7638
+            33278.7465
           ],
-          "median": 32046.7638
+          "median": 33278.7465
         },
         "GET /api/users": {
           "results": [
-            26315.2642
+            30868.6763
           ],
-          "median": 26315.2642
+          "median": 30868.6763
         },
         "POST /api/users": {
           "results": [
-            21023.9688
+            22917.7109
           ],
-          "median": 21023.9688
+          "median": 22917.7109
         },
         "PUT /api/users/:id": {
           "results": [
-            19743.3919
+            20302.2146
           ],
-          "median": 19743.3919
+          "median": 20302.2146
         },
         "DELETE /api/users/:id": {
           "results": [
-            28288.2719
+            32289.0298
           ],
-          "median": 28288.2719
+          "median": 32289.0298
         },
         "GET /api/posts/:id": {
           "results": [
-            27209.5126
+            31761.8818
           ],
-          "median": 27209.5126
+          "median": 31761.8818
         },
         "GET /api/posts": {
           "results": [
-            28648.8519
+            29364.6118
           ],
-          "median": 28648.8519
+          "median": 29364.6118
         },
         "POST /api/posts": {
           "results": [
-            22980.0563
+            22654.0604
           ],
-          "median": 22980.0563
+          "median": 22654.0604
         },
         "PUT /api/posts/:id": {
           "results": [
-            20301.4204
+            20219.8226
           ],
-          "median": 20301.4204
+          "median": 20219.8226
         },
         "POST /api/comments": {
           "results": [
-            23956.4537
+            25113.1289
           ],
-          "median": 23956.4537
+          "median": 25113.1289
         }
       },
-      "average": 25051.395549999997
+      "average": 26876.98836
     },
     {
       "runtime": "deno",
@@ -231,66 +231,134 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            30737.2792
+            26324.8117
           ],
-          "median": 30737.2792
+          "median": 26324.8117
         },
         "GET /api/users": {
           "results": [
-            38977.2602
+            36200.023
           ],
-          "median": 38977.2602
+          "median": 36200.023
         },
         "POST /api/users": {
           "results": [
-            29011.6778
+            28035.0179
           ],
-          "median": 29011.6778
+          "median": 28035.0179
         },
         "PUT /api/users/:id": {
           "results": [
-            21943.103
+            22443.2921
           ],
-          "median": 21943.103
+          "median": 22443.2921
         },
         "DELETE /api/users/:id": {
           "results": [
-            41593.2806
+            36302.5904
           ],
-          "median": 41593.2806
+          "median": 36302.5904
         },
         "GET /api/posts/:id": {
           "results": [
-            38654.2713
+            39215.727
           ],
-          "median": 38654.2713
+          "median": 39215.727
         },
         "GET /api/posts": {
           "results": [
-            37252.6542
+            35987.5662
           ],
-          "median": 37252.6542
+          "median": 35987.5662
         },
         "POST /api/posts": {
           "results": [
-            29578.191
+            26912.8569
           ],
-          "median": 29578.191
+          "median": 26912.8569
         },
         "PUT /api/posts/:id": {
           "results": [
-            22730.9545
+            21949.2484
           ],
-          "median": 22730.9545
+          "median": 21949.2484
         },
         "POST /api/comments": {
           "results": [
-            29391.6048
+            28822.7915
           ],
-          "median": 29391.6048
+          "median": 28822.7915
         }
       },
-      "average": 31987.02766
+      "average": 30219.392509999998
+    },
+    {
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "endpoints": {
+        "GET /api/users/:id": {
+          "results": [
+            28303.702
+          ],
+          "median": 28303.702
+        },
+        "GET /api/users": {
+          "results": [
+            35851.9224
+          ],
+          "median": 35851.9224
+        },
+        "POST /api/users": {
+          "results": [
+            27194.4311
+          ],
+          "median": 27194.4311
+        },
+        "PUT /api/users/:id": {
+          "results": [
+            20376.9562
+          ],
+          "median": 20376.9562
+        },
+        "DELETE /api/users/:id": {
+          "results": [
+            38000.8777
+          ],
+          "median": 38000.8777
+        },
+        "GET /api/posts/:id": {
+          "results": [
+            39641.3527
+          ],
+          "median": 39641.3527
+        },
+        "GET /api/posts": {
+          "results": [
+            38289.6984
+          ],
+          "median": 38289.6984
+        },
+        "POST /api/posts": {
+          "results": [
+            28160.4098
+          ],
+          "median": 28160.4098
+        },
+        "PUT /api/posts/:id": {
+          "results": [
+            20525.5287
+          ],
+          "median": 20525.5287
+        },
+        "POST /api/comments": {
+          "results": [
+            26362.2127
+          ],
+          "median": 26362.2127
+        }
+      },
+      "average": 30270.709169999995
     },
     {
       "runtime": "node",
@@ -299,66 +367,66 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            5727.1394
+            5832.5159
           ],
-          "median": 5727.1394
+          "median": 5832.5159
         },
         "GET /api/users": {
           "results": [
-            6064.3074
+            5694.175
           ],
-          "median": 6064.3074
+          "median": 5694.175
         },
         "POST /api/users": {
           "results": [
-            5180.8976
+            5007.7237
           ],
-          "median": 5180.8976
+          "median": 5007.7237
         },
         "PUT /api/users/:id": {
           "results": [
-            5101.2602
+            4968.9693
           ],
-          "median": 5101.2602
+          "median": 4968.9693
         },
         "DELETE /api/users/:id": {
           "results": [
-            6218.4031
+            6053.3885
           ],
-          "median": 6218.4031
+          "median": 6053.3885
         },
         "GET /api/posts/:id": {
           "results": [
-            6151.5013
+            6105.8131
           ],
-          "median": 6151.5013
+          "median": 6105.8131
         },
         "GET /api/posts": {
           "results": [
-            6214.7445
+            6085.8788
           ],
-          "median": 6214.7445
+          "median": 6085.8788
         },
         "POST /api/posts": {
           "results": [
-            5291.6237
+            5007.5683
           ],
-          "median": 5291.6237
+          "median": 5007.5683
         },
         "PUT /api/posts/:id": {
           "results": [
-            5140.7723
+            5048.6486
           ],
-          "median": 5140.7723
+          "median": 5048.6486
         },
         "POST /api/comments": {
           "results": [
-            5174.7603
+            5154.2829
           ],
-          "median": 5174.7603
+          "median": 5154.2829
         }
       },
-      "average": 5626.54098
+      "average": 5495.896409999999
     },
     {
       "runtime": "node",
@@ -367,66 +435,66 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            22040.9035
+            16745.16
           ],
-          "median": 22040.9035
+          "median": 16745.16
         },
         "GET /api/users": {
           "results": [
-            20487.325
+            16931.6303
           ],
-          "median": 20487.325
+          "median": 16931.6303
         },
         "POST /api/users": {
           "results": [
-            11948.1899
+            10627.5923
           ],
-          "median": 11948.1899
+          "median": 10627.5923
         },
         "PUT /api/users/:id": {
           "results": [
-            12344.3392
+            10873.6387
           ],
-          "median": 12344.3392
+          "median": 10873.6387
         },
         "DELETE /api/users/:id": {
           "results": [
-            19645.9541
+            18177.4082
           ],
-          "median": 19645.9541
+          "median": 18177.4082
         },
         "GET /api/posts/:id": {
           "results": [
-            21730.7403
+            17212.164
           ],
-          "median": 21730.7403
+          "median": 17212.164
         },
         "GET /api/posts": {
           "results": [
-            20540.4137
+            17464.4602
           ],
-          "median": 20540.4137
+          "median": 17464.4602
         },
         "POST /api/posts": {
           "results": [
-            12441.2884
+            11307.8799
           ],
-          "median": 12441.2884
+          "median": 11307.8799
         },
         "PUT /api/posts/:id": {
           "results": [
-            12764.5478
+            10661.8763
           ],
-          "median": 12764.5478
+          "median": 10661.8763
         },
         "POST /api/comments": {
           "results": [
-            13239.6271
+            10954.4328
           ],
-          "median": 13239.6271
+          "median": 10954.4328
         }
       },
-      "average": 16718.3329
+      "average": 14095.62427
     },
     {
       "runtime": "node",
@@ -435,66 +503,134 @@
       "endpoints": {
         "GET /api/users/:id": {
           "results": [
-            14284.8069
+            13686.1035
           ],
-          "median": 14284.8069
+          "median": 13686.1035
         },
         "GET /api/users": {
           "results": [
-            13960.0635
+            12970.1626
           ],
-          "median": 13960.0635
+          "median": 12970.1626
         },
         "POST /api/users": {
           "results": [
-            6813.7726
+            6666.922
           ],
-          "median": 6813.7726
+          "median": 6666.922
         },
         "PUT /api/users/:id": {
           "results": [
-            6945.9795
+            6633.9362
           ],
-          "median": 6945.9795
+          "median": 6633.9362
         },
         "DELETE /api/users/:id": {
           "results": [
-            14348.6341
+            12961.9061
           ],
-          "median": 14348.6341
+          "median": 12961.9061
         },
         "GET /api/posts/:id": {
           "results": [
-            14876.8795
+            13963.5313
           ],
-          "median": 14876.8795
+          "median": 13963.5313
         },
         "GET /api/posts": {
           "results": [
-            13832.2677
+            13962.4004
           ],
-          "median": 13832.2677
+          "median": 13962.4004
         },
         "POST /api/posts": {
           "results": [
-            7286.8326
+            7137.9269
           ],
-          "median": 7286.8326
+          "median": 7137.9269
         },
         "PUT /api/posts/:id": {
           "results": [
-            7022.0277
+            6872.2171
           ],
-          "median": 7022.0277
+          "median": 6872.2171
         },
         "POST /api/comments": {
           "results": [
-            7560.2714
+            7331.7946
           ],
-          "median": 7560.2714
+          "median": 7331.7946
         }
       },
-      "average": 10693.153549999999
+      "average": 10218.690069999999
+    },
+    {
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "endpoints": {
+        "GET /api/users/:id": {
+          "results": [
+            10932.687
+          ],
+          "median": 10932.687
+        },
+        "GET /api/users": {
+          "results": [
+            10985.5867
+          ],
+          "median": 10985.5867
+        },
+        "POST /api/users": {
+          "results": [
+            6654.827
+          ],
+          "median": 6654.827
+        },
+        "PUT /api/users/:id": {
+          "results": [
+            6807.7816
+          ],
+          "median": 6807.7816
+        },
+        "DELETE /api/users/:id": {
+          "results": [
+            8697.4728
+          ],
+          "median": 8697.4728
+        },
+        "GET /api/posts/:id": {
+          "results": [
+            10325.9275
+          ],
+          "median": 10325.9275
+        },
+        "GET /api/posts": {
+          "results": [
+            11055.4122
+          ],
+          "median": 11055.4122
+        },
+        "POST /api/posts": {
+          "results": [
+            7031.7339
+          ],
+          "median": 7031.7339
+        },
+        "PUT /api/posts/:id": {
+          "results": [
+            6928.4859
+          ],
+          "median": 6928.4859
+        },
+        "POST /api/comments": {
+          "results": [
+            7318.3988
+          ],
+          "median": 7318.3988
+        }
+      },
+      "average": 8673.83134
     }
   ]
 }
