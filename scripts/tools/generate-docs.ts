@@ -480,8 +480,12 @@ Benchmark results for HTTP frameworks running in a single process.
 		const displayName = displayNameMap.get(fw) || framework
 		md += `| ${runtime.padEnd(7)} | ${displayName.padEnd(14)} |`
 		tests.forEach(test => {
-			const val = dataMap.get(fw)?.get(test) || 0
-			md += ` ${val.toFixed(0).padStart(9).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} |`
+			const val = dataMap.get(fw)?.get(test)
+			if (val) {
+				md += ` ${val.toFixed(0).padStart(9).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} |`
+			} else {
+				md += ` ${'-'.padStart(9)} |`
+			}
 		})
 		md += `\n`
 	})
