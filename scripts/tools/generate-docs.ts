@@ -79,7 +79,7 @@ const generateRelativeSVG = (
 	outputDir: string
 ) => {
 	const width = 1000
-	const height = 500
+	const height = 600
 	const chartLeft = 80
 	const chartRight = 920
 	const chartTop = 60
@@ -88,14 +88,16 @@ const generateRelativeSVG = (
 	const chartHeight = chartBottom - chartTop
 
 	// Calculate relative performance
-	const relativeData = new Map<string, number[]>()
+	const relativeData = new Map<string, (number | null)[]>()
 	for (const test of tests) {
-		const values = frameworks.map(fw => dataMap.get(fw)?.get(test) || 0)
-		const max = Math.max(...values)
+		const values = frameworks.map(fw => dataMap.get(fw)?.get(test))
+		const max = Math.max(...values.filter(v => v !== undefined) as number[])
 
 		frameworks.forEach((fw, i) => {
 			if (!relativeData.has(fw)) relativeData.set(fw, [])
-			const relative = max > 0 ? (values[i] / max) * 100 : 0
+			const value = values[i]
+			// If no data for this test, push null instead of 0
+			const relative = value && max > 0 ? (value / max) * 100 : null
 			relativeData.get(fw)!.push(relative)
 		})
 	}
@@ -194,13 +196,20 @@ const generateRelativeSVG = (
 		const color = getColor(fw)
 		const fwName = fw.split('/')[1]
 		const markerClass = getMarkerClass(fw)
-		const points = data.map((val, i) => `${getX(i)},${getY(val)}`).join(' ')
+		// Filter out null values when creating polyline points
+		const points = data
+			.map((val, i) => val !== null ? `${getX(i)},${getY(val)}` : null)
+			.filter(p => p !== null)
+			.join(' ')
 
 		svg += `\n  <!-- ${fw} -->\n`
-		svg += `  <polyline class="line-${fwName}" points="${points}"/>\n`
+		if (points) {
+			svg += `  <polyline class="line-${fwName}" points="${points}"/>\n`
+		}
 
-		// Markers
+		// Markers (skip null values)
 		data.forEach((val, i) => {
+			if (val === null) return // Skip null values
 			const x = getX(i)
 			const y = getY(val)
 			if (markerClass === 'circle') {
@@ -256,7 +265,7 @@ const generateAbsoluteSVG = (
 	outputDir: string
 ) => {
 	const width = 1000
-	const height = 500
+	const height = 600
 	const chartLeft = 80
 	const chartRight = 920
 	const chartTop = 60
@@ -368,17 +377,24 @@ const generateAbsoluteSVG = (
 		const fwName = fw.split('/')[1]
 		const markerClass = getMarkerClass(fw)
 
-		const points = tests.map((test, i) => {
-			const val = dataMap.get(fw)?.get(test) || 0
-			return `${getX(i)},${getY(val)}`
-		}).join(' ')
+		// Filter out tests with no data
+		const points = tests
+			.map((test, i) => {
+				const val = dataMap.get(fw)?.get(test)
+				return val ? `${getX(i)},${getY(val)}` : null
+			})
+			.filter(p => p !== null)
+			.join(' ')
 
 		svg += `\n  <!-- ${fw} -->\n`
-		svg += `  <polyline class="line-${fwName}" points="${points}"/>\n`
+		if (points) {
+			svg += `  <polyline class="line-${fwName}" points="${points}"/>\n`
+		}
 
-		// Markers
+		// Markers (skip tests with no data)
 		tests.forEach((test, i) => {
-			const val = dataMap.get(fw)?.get(test) || 0
+			const val = dataMap.get(fw)?.get(test)
+			if (!val) return // Skip if no data
 			const x = getX(i)
 			const y = getY(val)
 			if (markerClass === 'circle') {
