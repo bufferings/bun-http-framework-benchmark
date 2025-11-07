@@ -199,8 +199,16 @@ const startServer = async (target: string) => {
 
 // Stop server on target VM
 const stopServer = async () => {
-	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="screen -S benchmark -X quit"`.quiet()
-	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f 'bun run\\|node\\|deno'"`.quiet()
+	try {
+		await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="screen -S benchmark -X quit"`.quiet()
+	} catch {
+		// Ignore if no session exists
+	}
+	try {
+		await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f 'bun run\\|node\\|deno'"`.quiet()
+	} catch {
+		// Ignore if no processes found
+	}
 	await sleep(1)
 }
 
