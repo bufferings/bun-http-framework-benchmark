@@ -4,17 +4,17 @@ Benchmark results for HTTP frameworks running in a single process.
 
 ### Results (req/s)
 
-| Runtime | Framework      | ping      | query     | body      | zod       | valibot   | arktype   |
-|---------|----------------|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|
-| bun     | elysia@1.4.13  |    166,187 |     94,998 |     78,037 |     53,240 |     54,687 |     53,243 |
-| bun     | hono@4.10.2    |     98,944 |     74,448 |     58,526 |     43,356 |     43,575 |     42,418 |
-| bun     | kori@0.3.4     |     94,796 |     79,005 |     71,203 |     36,317 |     36,813 |     35,590 |
-| deno    | hono@4.10.2    |     90,165 |     56,380 |     39,054 |     34,405 |     33,308 |     35,217 |
-| deno    | kori@0.3.4     |     79,961 |     67,652 |     49,555 |     35,167 |     33,839 |     34,830 |
-| node    | fastify@5.3.2  |     44,930 |     41,778 |     21,432 |         - |         - |         - |
-| node    | hono@4.10.2    |     38,093 |     31,372 |     11,384 |     10,692 |     10,603 |     10,725 |
-| node    | kori@0.3.4     |     35,236 |     30,498 |     13,043 |     11,098 |     11,252 |     11,064 |
-| node    | express@5.1.0  |     10,233 |      9,539 |      6,966 |         - |         - |         - |
+| Runtime | Framework      | ping      | query     | body      | zod       | valibot   | arktype   | elysia-t  |
+|---------|----------------|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|
+| bun     | elysia@1.4.13  |    113,824 |     60,920 |     40,921 |     34,260 |     35,302 |     34,148 |     31,595 |
+| deno    | hono@4.10.2    |     65,747 |     42,756 |     31,162 |     30,000 |     28,486 |     27,062 |         - |
+| bun     | hono@4.10.2    |     61,792 |     50,085 |     42,456 |     27,352 |     25,322 |     28,113 |         - |
+| bun     | kori@0.3.4     |     58,218 |     50,747 |     49,594 |     23,253 |     23,167 |     24,636 |         - |
+| deno    | kori@0.3.4     |     54,105 |     57,622 |     36,330 |     28,985 |     28,738 |     28,953 |         - |
+| node    | fastify@5.3.2  |     23,163 |     23,588 |     12,962 |         - |         - |         - |         - |
+| node    | kori@0.3.4     |     21,557 |     17,542 |      8,905 |      7,979 |      7,798 |      8,055 |         - |
+| node    | hono@4.10.2    |     20,844 |     19,645 |      8,039 |      7,344 |      7,546 |      7,588 |         - |
+| node    | express@5.1.0  |      7,639 |      6,933 |      4,957 |         - |         - |         - |         - |
 
 ### Relative Performance (%)
 
@@ -32,9 +32,9 @@ Shows the actual requests per second for each framework across all test cases.
 
 | Item | Value |
 |---|---|
-| Date | 2025-11-07T15:56:50.568Z |
+| Date | 2025-11-07T17:35:14.113Z |
 | Tool | oha |
-| Settings | 30s duration, 200 connections, 3 runs |
+| Settings | 5s duration, 128 connections, 1 run |
 | Runtimes | Bun 1.3.1, Node 22.21.1, Deno 2.5.6 |
 
 Machine:
@@ -43,5 +43,5 @@ Machine:
 |---|---|
 | Platform | linux |
 | OS | linux 6.11.0-1018-azure |
-| CPU | Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz (4 cores) |
+| CPU | AMD EPYC 7763 64-Core Processor (4 cores) |
 | Memory | 15.6GB |
