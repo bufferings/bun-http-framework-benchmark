@@ -247,6 +247,17 @@ const toNumber = (a: string) => +a.replaceAll(',', '')
 if (!existsSync('results')) mkdirSync('results')
 
 const main = async () => {
+	// Sync repository to target VM
+	console.log(`Syncing repository to ${targetVmName}...`)
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="rm -rf ~/bun-http-framework-benchmark && mkdir -p ~/bun-http-framework-benchmark"`.quiet()
+	await Bun.$`gcloud compute scp --recurse --internal-ip --zone=${gcpZone} --project=${gcpProjectId} ./src ./package.json ./bun.lockb ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
+
+	console.log('Installing dependencies on target VM...')
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
+
+	console.log('Setting ulimit on target VM...')
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="ulimit -n 65535"`.quiet()
+
 	// Get target IP
 	const targetIp = await getTargetIp()
 	console.log(`Target VM IP: ${targetIp}`)
