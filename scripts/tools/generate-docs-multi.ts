@@ -13,6 +13,14 @@ export type MultiBenchmarkResult = {
 	average: number
 }
 
+export type Environment = {
+	platform?: string
+	os?: string
+	cpu?: string
+	memory?: string
+	runtimes?: Record<string, string>
+}
+
 export type MultiResults = {
 	meta: {
 		timestamp: string
@@ -22,12 +30,10 @@ export type MultiResults = {
 			connections: number
 			runs: number
 		}
-		environment?: {
-			platform?: string
-			os?: string
-			cpu?: string
-			memory?: string
-			runtimes?: Record<string, string>
+		environment?: Environment
+		environments?: {
+			load?: Environment
+			target?: Environment
 		}
 	}
 	benchmarks: MultiBenchmarkResult[]
@@ -606,6 +612,43 @@ Machine:
 		if (env.os) md += `\n| OS | ${env.os} |`
 		if (env.cpu) md += `\n| CPU | ${env.cpu} |`
 		if (env.memory) md += `\n| Memory | ${env.memory} |`
+	} else if (results.meta.environments) {
+		// 2-VM case
+		// Add runtime versions from target
+		if (results.meta.environments.target?.runtimes) {
+			const runtimesStr = Object.entries(results.meta.environments.target.runtimes)
+				.map(([name, version]) => `${name.charAt(0).toUpperCase() + name.slice(1)} ${version}`)
+				.join(', ')
+			md += `\n| Runtimes | ${runtimesStr} |`
+		}
+
+		md += `
+
+Load Machine:
+
+| Item | Value |
+|---|---|`
+		if (results.meta.environments.load) {
+			const load = results.meta.environments.load
+			if (load.platform) md += `\n| Platform | ${load.platform} |`
+			if (load.os) md += `\n| OS | ${load.os} |`
+			if (load.cpu) md += `\n| CPU | ${load.cpu} |`
+			if (load.memory) md += `\n| Memory | ${load.memory} |`
+		}
+
+		md += `
+
+Target Machine:
+
+| Item | Value |
+|---|---|`
+		if (results.meta.environments.target) {
+			const target = results.meta.environments.target
+			if (target.platform) md += `\n| Platform | ${target.platform} |`
+			if (target.os) md += `\n| OS | ${target.os} |`
+			if (target.cpu) md += `\n| CPU | ${target.cpu} |`
+			if (target.memory) md += `\n| Memory | ${target.memory} |`
+		}
 	}
 
 	md += `\n`

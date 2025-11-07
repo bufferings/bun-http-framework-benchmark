@@ -1,0 +1,183 @@
+name: Benchmark Multi on GCP (2-VM)
+
+on:
+    workflow_dispatch:
+        inputs:
+            time:
+                description: 'Benchmark duration in seconds'
+                required: false
+                default: '30'
+                type: string
+            connections:
+                description: 'Number of concurrent connections'
+                required: false
+                default: '128'
+                type: string
+            runs:
+                description: 'Number of runs per benchmark (median)'
+                required: false
+                default: '1'
+                type: string
+
+concurrency:
+    group: benchmark-multi-gcp-2vm
+    cancel-in-progress: true
+
+permissions:
+    id-token: write
+    contents: read
+
+env:
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GCP_ZONE: ${{ secrets.GCP_ZONE }}
+    TARGET_VM_NAME: bench-vm-target
+    LOAD_VM_NAME: bench-vm-load
+
+jobs:
+    start-vms:
+        name: Start GCP VMs
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Start target VM
+              run: |
+                  echo "Starting target VM: ${{ env.TARGET_VM_NAME }}"
+                  gcloud compute instances start ${{ env.TARGET_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+            - name: Start load VM
+              run: |
+                  echo "Starting load VM: ${{ env.LOAD_VM_NAME }}"
+                  gcloud compute instances start ${{ env.LOAD_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }}
+
+    benchmark:
+        name: Run Multi-Endpoint Benchmarks
+        needs: start-vms
+        runs-on: [self-hosted, bench-vm-load]
+        timeout-minutes: 180
+        permissions:
+            contents: write
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install git
+              run: |
+                  if ! command -v git &> /dev/null; then
+                      sudo apt-get update
+                      sudo apt-get install -y git
+                  fi
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Install dependencies
+              run: bun install
+
+            - name: Install Node.js dependencies
+              run: npm install
+
+            - name: Install oha
+              run: |
+                  wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
+                  chmod +x oha-linux-amd64
+                  sudo mv oha-linux-amd64 /usr/local/bin/oha
+
+            - name: Run benchmark
+              run: |
+                  TIME="${{ inputs.time || '30' }}"
+                  CONNECTIONS="${{ inputs.connections || '128' }}"
+                  RUNS="${{ inputs.runs || '1' }}"
+                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
+                  bun run scripts/bench-multi-2vm-gcp.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+              env:
+                  NODE_ENV: production
+                  TARGET_VM_NAME: ${{ env.TARGET_VM_NAME }}
+                  LOAD_VM_NAME: ${{ env.LOAD_VM_NAME }}
+                  GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}
+                  GCP_ZONE: ${{ env.GCP_ZONE }}
+                  PLATFORM: GCP (2-VM)
+
+            - name: Generate report
+              run: bun run scripts/report-multi.ts results/multi-2vm.json docs/bench-multi-2vm
+              if: success()
+
+            - name: Display results
+              run: |
+                  if [ -f docs/bench-multi-2vm/README.md ] && [ -s docs/bench-multi-2vm/README.md ]; then
+                    # Display table section (from start until "### Relative Performance")
+                    sed -n '1,/^### Relative Performance/p' docs/bench-multi-2vm/README.md | sed '$d' >> $GITHUB_STEP_SUMMARY
+                    # Display environment section (from "### Benchmark Environment" to end)
+                    sed -n '/^### Benchmark Environment/,$p' docs/bench-multi-2vm/README.md >> $GITHUB_STEP_SUMMARY
+                  else
+                    echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
+                  fi
+              if: always()
+
+            - name: Commit and push results
+              run: |
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git add docs/bench-multi-2vm/
+                  if git diff --cached --quiet; then
+                    echo "No changes to commit"
+                  else
+                    git commit -m "Update multi-endpoint benchmark results - $(date +%Y-%m-%d)"
+                    git push
+                  fi
+              if: success()
+
+    stop-vms:
+        name: Stop GCP VMs
+        needs: [start-vms, benchmark]
+        if: always()
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Authenticate to Google Cloud
+              uses: google-github-actions/auth@v3
+              with:
+                  project_id: ${{ secrets.GCP_PROJECT_ID }}
+                  workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+                  service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+            - name: Setup gcloud
+              uses: google-github-actions/setup-gcloud@v3.0.1
+
+            - name: Stop target VM
+              run: |
+                  echo "Stopping target VM: ${{ env.TARGET_VM_NAME }}"
+                  gcloud compute instances stop ${{ env.TARGET_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }} || true
+
+            - name: Stop load VM
+              run: |
+                  echo "Stopping load VM: ${{ env.LOAD_VM_NAME }}"
+                  gcloud compute instances stop ${{ env.LOAD_VM_NAME }} \
+                    --project=${{ env.GCP_PROJECT_ID }} \
+                    --zone=${{ env.GCP_ZONE }} || true
+
