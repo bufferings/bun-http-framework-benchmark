@@ -1,0 +1,171 @@
+<svg width="1400" height="540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .chart-bg { fill: #2d2d2d; }
+      .stripe { fill: rgba(255,255,255,0.03); }
+      .grid-line { stroke: rgba(255,255,255,0.1); stroke-width: 1; }
+      .axis-line { stroke: rgba(255,255,255,0.3); stroke-width: 2; }
+      .label { fill: #b0b0b0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 14px; }
+      .title { fill: #ffffff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 16px; font-weight: normal; }
+      .line-elysia { stroke: #8b5cf6; fill: none; stroke-width: 2; }
+      .line-kori { stroke: #3b82f6; fill: none; stroke-width: 2; }
+      .line-hono { stroke: #f59e0b; fill: none; stroke-width: 2; }
+      .line-fastify { stroke: #10b981; fill: none; stroke-width: 2; }
+      .line-express { stroke: #ec4899; fill: none; stroke-width: 2; }
+      .marker { fill: #2d2d2d; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect class="chart-bg" width="1400" height="540"/>
+
+  <!-- Alternating stripes -->
+  <rect class="stripe" x="220" y="60" width="120" height="340"/>
+  <rect class="stripe" x="460" y="60" width="120" height="340"/>
+  <rect class="stripe" x="700" y="60" width="120" height="340"/>
+  <rect class="stripe" x="940" y="60" width="120" height="340"/>
+  <rect class="stripe" x="1180" y="60" width="120" height="340"/>
+
+  <!-- Grid lines -->
+  <line class="grid-line" x1="100" y1="400" x2="1300" y2="400"/>
+  <line class="grid-line" x1="100" y1="332" x2="1300" y2="332"/>
+  <line class="grid-line" x1="100" y1="264" x2="1300" y2="264"/>
+  <line class="grid-line" x1="100" y1="196" x2="1300" y2="196"/>
+  <line class="grid-line" x1="100" y1="128" x2="1300" y2="128"/>
+  <line class="grid-line" x1="100" y1="60" x2="1300" y2="60"/>
+
+  <!-- Axes -->
+  <line class="axis-line" x1="100" y1="60" x2="100" y2="400"/>
+  <line class="axis-line" x1="100" y1="400" x2="1300" y2="400"/>
+
+  <!-- Y-axis labels -->
+  <text class="label" x="90" y="405" text-anchor="end">0k</text>
+  <text class="label" x="90" y="337" text-anchor="end">20k</text>
+  <text class="label" x="90" y="269" text-anchor="end">40k</text>
+  <text class="label" x="90" y="201" text-anchor="end">60k</text>
+  <text class="label" x="90" y="133" text-anchor="end">80k</text>
+  <text class="label" x="90" y="65" text-anchor="end">100k</text>
+
+  <!-- Y-axis title -->
+  <text class="title" x="20" y="230" text-anchor="middle" transform="rotate(-90, 20, 230)">Requests per Second</text>
+
+  <!-- X-axis labels -->
+  <text class="label" x="160" y="425" text-anchor="middle">①</text>
+  <text class="label" x="280" y="425" text-anchor="middle">②</text>
+  <text class="label" x="400" y="425" text-anchor="middle">③</text>
+  <text class="label" x="520" y="425" text-anchor="middle">④</text>
+  <text class="label" x="640" y="425" text-anchor="middle">⑤</text>
+  <text class="label" x="760" y="425" text-anchor="middle">⑥</text>
+  <text class="label" x="880" y="425" text-anchor="middle">⑦</text>
+  <text class="label" x="1000" y="425" text-anchor="middle">⑧</text>
+  <text class="label" x="1120" y="425" text-anchor="middle">⑨</text>
+  <text class="label" x="1240" y="425" text-anchor="middle">⑩</text>
+
+  <!-- bun/elysia -->
+  <polyline class="line-elysia" points="160,205.02414774 280,256.46632284 400,294.01919704 520,288.41515078000003 640,159.81695316000003 760,190.74915390000004 880,239.19167288 1000,297.21006916 1120,296.59047458 1240,272.40608928"/>
+  <circle class="marker" cx="160" cy="205.02414774" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="280" cy="256.46632284" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="400" cy="294.01919704" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="520" cy="288.41515078000003" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="640" cy="159.81695316000003" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="760" cy="190.74915390000004" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="880" cy="239.19167288" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="1000" cy="297.21006916" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="1120" cy="296.59047458" r="6" stroke="#8b5cf6"/>
+  <circle class="marker" cx="1240" cy="272.40608928" r="6" stroke="#8b5cf6"/>
+
+  <!-- deno/hono -->
+  <polyline class="line-hono" points="160,295.49325072 280,267.47731532 400,301.36029548 520,325.3934498 640,258.58284596 760,268.57547758 880,273.34097572 1000,299.4341506 1120,322.7147547 1240,300.06854368"/>
+  <rect class="marker" x="154" y="289.49325072" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="274" y="261.47731532" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="394" y="295.36029548" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="514" y="319.3934498" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="634" y="252.58284596" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="754" y="262.57547758" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="874" y="267.34097572" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="994" y="293.4341506" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="1114" y="316.7147547" width="12" height="12" stroke="#f59e0b"/>
+  <rect class="marker" x="1234" y="294.06854368" width="12" height="12" stroke="#f59e0b"/>
+
+  <!-- bun/hono -->
+  <polyline class="line-hono" points="160,281.56729884 280,286.95956012 400,309.39829192 520,321.2923494 640,286.3799866 760,305.33762602 880,291.30919134 1000,312.23298208 1120,328.76476536 1240,312.530801"/>
+  <circle class="marker" cx="160" cy="281.56729884" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="280" cy="286.95956012" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="400" cy="309.39829192" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="520" cy="321.2923494" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="640" cy="286.3799866" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="760" cy="305.33762602" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="880" cy="291.30919134" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="1000" cy="312.23298208" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="1120" cy="328.76476536" r="6" stroke="#f59e0b"/>
+  <circle class="marker" cx="1240" cy="312.530801" r="6" stroke="#f59e0b"/>
+
+  <!-- bun/kori -->
+  <polyline class="line-kori" points="160,291.04100308 280,310.52810172 400,328.51850608 520,332.87246754 640,303.81987554 760,307.48765716 880,302.59390354 1000,321.86780858 1120,330.97517064 1240,318.54805742"/>
+  <circle class="marker" cx="160" cy="291.04100308" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="280" cy="310.52810172" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="400" cy="328.51850608" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="520" cy="332.87246754" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="640" cy="303.81987554" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="760" cy="307.48765716" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="880" cy="302.59390354" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="1000" cy="321.86780858" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="1120" cy="330.97517064" r="6" stroke="#3b82f6"/>
+  <circle class="marker" cx="1240" cy="318.54805742" r="6" stroke="#3b82f6"/>
+
+  <!-- node/fastify -->
+  <polyline class="line-fastify" points="160,325.0609281 280,330.343095 400,359.37615434 520,358.02924672 640,333.20375606 760,326.11548298 880,330.16259342 1000,357.69961944 1120,356.60053748 1240,354.98526786"/>
+  <polygon class="marker" points="160,318.0609281 154,330.0609281 166,330.0609281" stroke="#10b981"/>
+  <polygon class="marker" points="280,323.343095 274,335.343095 286,335.343095" stroke="#10b981"/>
+  <polygon class="marker" points="400,352.37615434 394,364.37615434 406,364.37615434" stroke="#10b981"/>
+  <polygon class="marker" points="520,351.02924672 514,363.02924672 526,363.02924672" stroke="#10b981"/>
+  <polygon class="marker" points="640,326.20375606 634,338.20375606 646,338.20375606" stroke="#10b981"/>
+  <polygon class="marker" points="760,319.11548298 754,331.11548298 766,331.11548298" stroke="#10b981"/>
+  <polygon class="marker" points="880,323.16259342 874,335.16259342 886,335.16259342" stroke="#10b981"/>
+  <polygon class="marker" points="1000,350.69961944 994,362.69961944 1006,362.69961944" stroke="#10b981"/>
+  <polygon class="marker" points="1120,349.60053748 1114,361.60053748 1126,361.60053748" stroke="#10b981"/>
+  <polygon class="marker" points="1240,347.98526786 1234,359.98526786 1246,359.98526786" stroke="#10b981"/>
+
+  <!-- node/hono -->
+  <polyline class="line-hono" points="160,351.43165654 280,352.5357841 400,376.83317316 520,376.3836697 640,351.21464406 760,349.4186097 880,352.97028982 1000,375.22476916 1120,376.12510582 1240,374.29507724"/>
+  <polygon class="marker" points="160,344.43165654 154,356.43165654 166,356.43165654" stroke="#f59e0b"/>
+  <polygon class="marker" points="280,345.5357841 274,357.5357841 286,357.5357841" stroke="#f59e0b"/>
+  <polygon class="marker" points="400,369.83317316 394,381.83317316 406,381.83317316" stroke="#f59e0b"/>
+  <polygon class="marker" points="520,369.3836697 514,381.3836697 526,381.3836697" stroke="#f59e0b"/>
+  <polygon class="marker" points="640,344.21464406 634,356.21464406 646,356.21464406" stroke="#f59e0b"/>
+  <polygon class="marker" points="760,342.4186097 754,354.4186097 766,354.4186097" stroke="#f59e0b"/>
+  <polygon class="marker" points="880,345.97028982 874,357.97028982 886,357.97028982" stroke="#f59e0b"/>
+  <polygon class="marker" points="1000,368.22476916 994,380.22476916 1006,380.22476916" stroke="#f59e0b"/>
+  <polygon class="marker" points="1120,369.12510582 1114,381.12510582 1126,381.12510582" stroke="#f59e0b"/>
+  <polygon class="marker" points="1240,367.29507724 1234,379.29507724 1246,379.29507724" stroke="#f59e0b"/>
+
+  <!-- node/express -->
+  <polyline class="line-express" points="160,380.52772604 280,379.38135484 400,382.38494816 520,382.65571532 640,378.85742946 760,379.08489558 880,378.8698687 1000,382.00847942 1120,382.52137418 1240,382.40581498"/>
+  <polygon class="marker" points="160,373.52772604 154,385.52772604 166,385.52772604" stroke="#ec4899"/>
+  <polygon class="marker" points="280,372.38135484 274,384.38135484 286,384.38135484" stroke="#ec4899"/>
+  <polygon class="marker" points="400,375.38494816 394,387.38494816 406,387.38494816" stroke="#ec4899"/>
+  <polygon class="marker" points="520,375.65571532 514,387.65571532 526,387.65571532" stroke="#ec4899"/>
+  <polygon class="marker" points="640,371.85742946 634,383.85742946 646,383.85742946" stroke="#ec4899"/>
+  <polygon class="marker" points="760,372.08489558 754,384.08489558 766,384.08489558" stroke="#ec4899"/>
+  <polygon class="marker" points="880,371.8698687 874,383.8698687 886,383.8698687" stroke="#ec4899"/>
+  <polygon class="marker" points="1000,375.00847942 994,387.00847942 1006,387.00847942" stroke="#ec4899"/>
+  <polygon class="marker" points="1120,375.52137418 1114,387.52137418 1126,387.52137418" stroke="#ec4899"/>
+  <polygon class="marker" points="1240,375.40581498 1234,387.40581498 1246,387.40581498" stroke="#ec4899"/>
+
+  <!-- Legend -->
+  <g transform="translate(100, 460)">
+    <circle class="marker" cx="0" cy="0" r="6" stroke="#8b5cf6"/>
+    <text class="label" x="15" y="4" font-size="13">bun/elysia</text>
+    <circle class="marker" cx="150" cy="0" r="6" stroke="#f59e0b"/>
+    <text class="label" x="165" y="4" font-size="13">bun/hono</text>
+    <circle class="marker" cx="300" cy="0" r="6" stroke="#3b82f6"/>
+    <text class="label" x="315" y="4" font-size="13">bun/kori</text>
+    <rect class="marker" x="-6" y="14" width="12" height="12" stroke="#f59e0b"/>
+    <text class="label" x="15" y="24" font-size="13">deno/hono</text>
+    <polygon class="marker" points="0,33 -6,45 6,45" stroke="#10b981"/>
+    <text class="label" x="15" y="44" font-size="13">node/fastify</text>
+    <polygon class="marker" points="150,33 144,45 156,45" stroke="#f59e0b"/>
+    <text class="label" x="165" y="44" font-size="13">node/hono</text>
+    <polygon class="marker" points="300,33 294,45 306,45" stroke="#ec4899"/>
+    <text class="label" x="315" y="44" font-size="13">node/express</text>
+  </g>
+</svg>
