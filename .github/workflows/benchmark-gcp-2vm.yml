@@ -20,7 +20,7 @@ on:
                 type: string
 
 concurrency:
-    group: benchmark-gcp-2vm
+    group: gcp-2vm-benchmarks
     cancel-in-progress: true
 
 permissions:
