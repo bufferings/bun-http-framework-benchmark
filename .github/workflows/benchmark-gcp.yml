@@ -98,7 +98,10 @@ jobs:
             - name: Display results
               run: |
                   if [ -f docs/bench-single-gcp/README.md ] && [ -s docs/bench-single-gcp/README.md ]; then
-                    grep -v '!\[.*\](.*\.svg)' docs/bench-single-gcp/README.md >> $GITHUB_STEP_SUMMARY
+                    # Display table section (from start until "### Relative Performance")
+                    sed -n '1,/^### Relative Performance/p' docs/bench-single-gcp/README.md | sed '$d' >> $GITHUB_STEP_SUMMARY
+                    # Display environment section (from "### Benchmark Environment" to end)
+                    sed -n '/^### Benchmark Environment/,$p' docs/bench-single-gcp/README.md >> $GITHUB_STEP_SUMMARY
                   else
                     echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
                   fi
