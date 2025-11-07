@@ -4,4 +4,4 @@ fastify()
 	.post('/', async (req, reply) => {
 		reply.send(req.body)
 	})
-	.listen({ port: 3000 })
+	.listen({ host: '0.0.0.0', port: 3000 })
