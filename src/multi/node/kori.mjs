@@ -1,4 +1,5 @@
 import { createKori } from '@korix/kori'
+import { startNodejsServer } from '@korix/nodejs-server'
 import {
 	enableStdRequestValidation,
 	stdRequestSchema
@@ -53,9 +54,9 @@ app.get('/api/users/:id', {
 
 // 2. GET /api/users
 app.get('/api/users', {
-	requestSchema: stdRequestSchema({ query: paginationSchema }),
+	requestSchema: stdRequestSchema({ queries: paginationSchema }),
 	handler: (c) => {
-		const { page, limit } = c.req.validatedQuery()
+		const { page, limit } = c.req.validatedQueries()
 		return c.res.json({ page, limit, users: [] })
 	}
 })
@@ -99,9 +100,9 @@ app.get('/api/posts/:id', {
 
 // 7. GET /api/posts
 app.get('/api/posts', {
-	requestSchema: stdRequestSchema({ query: postsQuerySchema }),
+	requestSchema: stdRequestSchema({ queries: postsQuerySchema }),
 	handler: (c) => {
-		const { userId, page } = c.req.validatedQuery()
+		const { userId, page } = c.req.validatedQueries()
 		return c.res.json({ userId, page, posts: [] })
 	}
 })
@@ -131,4 +132,6 @@ app.post('/api/comments', {
 	handler: (c) => c.res.json(c.req.validatedBody())
 })
 
-;(await app.generate().onStart()).listen(3000)
+;(async () => {
+	await startNodejsServer(app, { port: 3000, hostname: '0.0.0.0' })
+})()

@@ -53,9 +53,9 @@ app.get('/api/users/:id', {
 
 // 2. GET /api/users
 app.get('/api/users', {
-	requestSchema: stdRequestSchema({ query: paginationSchema }),
+	requestSchema: stdRequestSchema({ queries: paginationSchema }),
 	handler: (c) => {
-		const { page, limit } = c.req.validatedQuery()
+		const { page, limit } = c.req.validatedQueries()
 		return c.res.json({ page, limit, users: [] })
 	}
 })
@@ -99,9 +99,9 @@ app.get('/api/posts/:id', {
 
 // 7. GET /api/posts
 app.get('/api/posts', {
-	requestSchema: stdRequestSchema({ query: postsQuerySchema }),
+	requestSchema: stdRequestSchema({ queries: postsQuerySchema }),
 	handler: (c) => {
-		const { userId, page } = c.req.validatedQuery()
+		const { userId, page } = c.req.validatedQueries()
 		return c.res.json({ userId, page, posts: [] })
 	}
 })
