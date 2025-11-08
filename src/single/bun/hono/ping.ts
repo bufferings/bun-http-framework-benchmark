@@ -1,8 +1,8 @@
-import { Hono } from 'hono'
-import { RegExpRouter } from 'hono/router/reg-exp-router'
+import { Hono } from "hono";
+import { RegExpRouter } from "hono/router/reg-exp-router";
 
-const app = new Hono({ router: new RegExpRouter() })
+const app = new Hono({ router: new RegExpRouter() });
 
-app.get('/', (c) => c.text('Hi'))
+app.get("/", (c) => c.text("Hi"));
 
-export default app
+export default app;

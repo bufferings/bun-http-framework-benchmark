@@ -1,102 +1,102 @@
 name: Benchmark
 
 on:
-    workflow_dispatch:
-        inputs:
-            time:
-                description: 'Benchmark duration in seconds'
-                required: false
-                default: '30'
-                type: string
-            connections:
-                description: 'Number of concurrent connections'
-                required: false
-                default: '128'
-                type: string
-            runs:
-                description: 'Number of runs per benchmark (median)'
-                required: false
-                default: '1'
-                type: string
+  workflow_dispatch:
+    inputs:
+      time:
+        description: "Benchmark duration in seconds"
+        required: false
+        default: "30"
+        type: string
+      connections:
+        description: "Number of concurrent connections"
+        required: false
+        default: "128"
+        type: string
+      runs:
+        description: "Number of runs per benchmark (median)"
+        required: false
+        default: "1"
+        type: string
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-    benchmark:
-        name: Run All Benchmarks
-        runs-on: ubuntu-latest
-        timeout-minutes: 120
+  benchmark:
+    name: Run All Benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
 
-        steps:
-            - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-            - name: Setup Bun
-              uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: latest
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-            - name: Setup Deno
-              uses: denoland/setup-deno@v2
-              with:
-                  deno-version: v2.x
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: '22'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
-            - name: Install dependencies
-              run: bun install
+      - name: Install dependencies
+        run: bun install
 
-            - name: Install Node.js dependencies
-              run: npm install
+      - name: Install Node.js dependencies
+        run: npm install
 
-            - name: Install oha
-              run: |
-                  wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
-                  chmod +x oha-linux-amd64
-                  sudo mv oha-linux-amd64 /usr/local/bin/oha
+      - name: Install oha
+        run: |
+          wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
+          chmod +x oha-linux-amd64
+          sudo mv oha-linux-amd64 /usr/local/bin/oha
 
-            - name: Run benchmarks
-              run: |
-                  ulimit -n 65535
-                  TIME="${{ inputs.time || '30' }}"
-                  CONNECTIONS="${{ inputs.connections || '128' }}"
-                  RUNS="${{ inputs.runs || '1' }}"
-                  echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
-                  bun run scripts/bench-single.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
-              env:
-                  NODE_ENV: production
-                  PLATFORM: GitHub Actions (ubuntu-latest)
+      - name: Run benchmarks
+        run: |
+          ulimit -n 65535
+          TIME="${{ inputs.time || '30' }}"
+          CONNECTIONS="${{ inputs.connections || '128' }}"
+          RUNS="${{ inputs.runs || '1' }}"
+          echo "Configuration: ${TIME}s duration, ${CONNECTIONS} connections, ${RUNS} runs"
+          bun run scripts/bench-single.ts --time=$TIME --connections=$CONNECTIONS --runs=$RUNS
+        env:
+          NODE_ENV: production
+          PLATFORM: GitHub Actions (ubuntu-latest)
 
-            - name: Generate report
-              run: bun run scripts/report-single.ts results/single.json docs/bench-single
-              if: success()
+      - name: Generate report
+        run: bun run scripts/report-single.ts results/single.json docs/bench-single
+        if: success()
 
-            - name: Display results
-              run: |
-                  if [ -f docs/bench-single/README.md ] && [ -s docs/bench-single/README.md ]; then
-                    # Display table section (from start until "### Relative Performance")
-                    sed -n '1,/^### Relative Performance/p' docs/bench-single/README.md | sed '$d' >> $GITHUB_STEP_SUMMARY
-                    # Display environment section (from "### Benchmark Environment" to end)
-                    sed -n '/^### Benchmark Environment/,$p' docs/bench-single/README.md >> $GITHUB_STEP_SUMMARY
-                  else
-                    echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
-                  fi
-              if: always()
+      - name: Display results
+        run: |
+          if [ -f docs/bench-single/README.md ] && [ -s docs/bench-single/README.md ]; then
+            # Display table section (from start until "### Relative Performance")
+            sed -n '1,/^### Relative Performance/p' docs/bench-single/README.md | sed '$d' >> $GITHUB_STEP_SUMMARY
+            # Display environment section (from "### Benchmark Environment" to end)
+            sed -n '/^### Benchmark Environment/,$p' docs/bench-single/README.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ No results found or results file is empty" >> $GITHUB_STEP_SUMMARY
+          fi
+        if: always()
 
-            - name: Commit and push results
-              run: |
-                  git config user.name "github-actions[bot]"
-                  git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git add docs/bench-single/
-                  if git diff --cached --quiet; then
-                    echo "No changes to commit"
-                  else
-                    git commit -m "Update benchmark results - $(date +%Y-%m-%d)"
-                    git pull --rebase origin main
-                    git push
-                  fi
-              if: success()
+      - name: Commit and push results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/bench-single/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update benchmark results - $(date +%Y-%m-%d)"
+            git pull --rebase origin main
+            git push
+          fi
+        if: success()

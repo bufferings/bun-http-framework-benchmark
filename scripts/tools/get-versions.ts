@@ -1,127 +1,128 @@
-import { readFileSync } from 'fs'
+import { readFileSync } from "fs";
 
 // Map framework names to their package names
 const packageMap: Record<string, string> = {
-	// Bun frameworks
-	'bun/elysia': 'elysia',
-	'bun/express': 'express',
-	'bun/hono': 'hono',
-	'bun/kori': '@korix/kori',
+  // Bun frameworks
+  "bun/elysia": "elysia",
+  "bun/express": "express",
+  "bun/hono": "hono",
+  "bun/kori": "@korix/kori",
 
-	// Deno frameworks
-	'deno/hono': 'hono',
-	'deno/kori': '@korix/kori',
+  // Deno frameworks
+  "deno/hono": "hono",
+  "deno/kori": "@korix/kori",
 
-	// Node frameworks
-	'node/express': 'express',
-	'node/fastify': 'fastify',
-	'node/hono': 'hono',
-	'node/kori': '@korix/kori'
-}
+  // Node frameworks
+  "node/express": "express",
+  "node/fastify": "fastify",
+  "node/hono": "hono",
+  "node/kori": "@korix/kori",
+};
 
-let packageJson: any = null
-let denoJson: any = null
+let packageJson: any = null;
+let denoJson: any = null;
 
 function getPackageJson() {
-	if (!packageJson) {
-		packageJson = JSON.parse(readFileSync('package.json', 'utf-8'))
-	}
-	return packageJson
+  if (!packageJson) {
+    packageJson = JSON.parse(readFileSync("package.json", "utf-8"));
+  }
+  return packageJson;
 }
 
 function getDenoJson() {
-	if (!denoJson) {
-		try {
-			denoJson = JSON.parse(readFileSync('deno.json', 'utf-8'))
-		} catch {
-			denoJson = {}
-		}
-	}
-	return denoJson
+  if (!denoJson) {
+    try {
+      denoJson = JSON.parse(readFileSync("deno.json", "utf-8"));
+    } catch {
+      denoJson = {};
+    }
+  }
+  return denoJson;
 }
 
 export function getVersion(framework: string): string {
-	const [runtime] = framework.split('/')
-	const packageName = packageMap[framework]
+  const [runtime] = framework.split("/");
+  const packageName = packageMap[framework];
 
-	if (!packageName) {
-		return ''
-	}
+  if (!packageName) {
+    return "";
+  }
 
-	// For runtime versions
-	if (packageName === 'bun') {
-		return process.env.BUN_VERSION || Bun.version || ''
-	}
+  // For runtime versions
+  if (packageName === "bun") {
+    return process.env.BUN_VERSION || Bun.version || "";
+  }
 
-	if (packageName === 'deno') {
-		return process.env.DENO_VERSION || ''
-	}
+  if (packageName === "deno") {
+    return process.env.DENO_VERSION || "";
+  }
 
-	if (packageName === 'node') {
-		return (
-			process.env.NODE_VERSION || process.version.replace(/^v/, '') || ''
-		)
-	}
+  if (packageName === "node") {
+    return (
+      process.env.NODE_VERSION || process.version.replace(/^v/, "") || ""
+    );
+  }
 
-	// For npm packages
-	const pkg = getPackageJson()
-	const allDeps = {
-		...pkg.dependencies,
-		...pkg.devDependencies
-	}
+  // For npm packages
+  const pkg = getPackageJson();
+  const allDeps = {
+    ...pkg.dependencies,
+    ...pkg.devDependencies,
+  };
 
-	if (allDeps[packageName]) {
-		return allDeps[packageName].replace(/^[\^~]/, '')
-	}
+  if (allDeps[packageName]) {
+    return allDeps[packageName].replace(/^[\^~]/, "");
+  }
 
-	// For deno imports (JSR format: jsr:@oak/oak@^16.1.0)
-	if (runtime === 'deno') {
-		const deno = getDenoJson()
-		if (deno.imports) {
-			// Try direct package name match
-			let importPath = deno.imports[packageName]
+  // For deno imports (JSR format: jsr:@oak/oak@^16.1.0)
+  if (runtime === "deno") {
+    const deno = getDenoJson();
+    if (deno.imports) {
+      // Try direct package name match
+      let importPath = deno.imports[packageName];
 
-			// If not found, try with jsr: prefix
-			if (!importPath) {
-				const jsrKey = Object.keys(deno.imports).find(
-					(key) =>
-						key === packageName || key.endsWith(`/${packageName}`)
-				)
-				if (jsrKey) {
-					importPath = deno.imports[jsrKey]
-				}
-			}
+      // If not found, try with jsr: prefix
+      if (!importPath) {
+        const jsrKey = Object.keys(deno.imports).find(
+          (key) => key === packageName || key.endsWith(`/${packageName}`),
+        );
+        if (jsrKey) {
+          importPath = deno.imports[jsrKey];
+        }
+      }
 
-			if (importPath) {
-				// Extract version from JSR or npm imports (e.g., jsr:@oak/oak@^16.1.0)
-				const versionMatch = importPath.match(/@([\^~]?)([0-9.]+)/)
-				if (versionMatch) {
-					return versionMatch[2]
-				}
-			}
-		}
-	}
+      if (importPath) {
+        // Extract version from JSR or npm imports (e.g., jsr:@oak/oak@^16.1.0)
+        const versionMatch = importPath.match(/@([\^~]?)([0-9.]+)/);
+        if (versionMatch) {
+          return versionMatch[2];
+        }
+      }
+    }
+  }
 
-	return ''
+  return "";
 }
 
 export function formatFrameworkWithVersion(framework: string): string {
-	// If framework is just a name (e.g., "elysia"), try to find it in packageMap
-	let lookupKey = framework
-	if (!framework.includes('/')) {
-		// Just framework name - use first match from packageMap
-		const foundKey = Object.keys(packageMap).find(key => key.endsWith(`/${framework}`))
-		if (foundKey) {
-			lookupKey = foundKey
-		}
-	}
+  // If framework is just a name (e.g., "elysia"), try to find it in packageMap
+  let lookupKey = framework;
+  if (!framework.includes("/")) {
+    // Just framework name - use first match from packageMap
+    const foundKey = Object.keys(packageMap).find((key) =>
+      key.endsWith(`/${framework}`)
+    );
+    if (foundKey) {
+      lookupKey = foundKey;
+    }
+  }
 
-	const version = getVersion(lookupKey)
-	const name = framework.split('/')[1] || framework
+  const version = getVersion(lookupKey);
+  const name = framework.split("/")[1] || framework;
 
-	if (version) {
-		return `${name}@${version}`
-	}
+  if (version) {
+    return `${name}@${version}`;
+  }
 
-	return name
+  return name;
 }

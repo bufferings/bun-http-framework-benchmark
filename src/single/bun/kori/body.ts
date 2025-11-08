@@ -1,9 +1,9 @@
-import { createKori } from '@korix/kori'
+import { createKori } from "@korix/kori";
 
-const app = createKori()
+const app = createKori();
 
-app.post('/', (c) => c.req.bodyJson().then((body) => c.res.json(body)))
+app.post("/", (c) => c.req.bodyJson().then((body) => c.res.json(body)));
 
 export default {
-	fetch: (await app.generate().onStart()).fetchHandler
-}
+  fetch: (await app.generate().onStart()).fetchHandler,
+};

@@ -1,9 +1,9 @@
-import { Hono } from 'hono'
-import { RegExpRouter } from 'hono/router/reg-exp-router'
-import { serve } from '@hono/node-server'
+import { Hono } from "hono";
+import { RegExpRouter } from "hono/router/reg-exp-router";
+import { serve } from "@hono/node-server";
 
-const app = new Hono({ router: new RegExpRouter() })
+const app = new Hono({ router: new RegExpRouter() });
 
-app.get('/', (c) => c.text('Hi'))
+app.get("/", (c) => c.text("Hi"));
 
-serve({ fetch: app.fetch, port: 3000 })
+serve({ fetch: app.fetch, port: 3000 });

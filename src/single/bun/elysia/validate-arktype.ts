@@ -1,12 +1,12 @@
-import { Elysia } from 'elysia'
-import { type } from 'arktype'
+import { Elysia } from "elysia";
+import { type } from "arktype";
 
 const arktypeSchema = type({
-	hello: 'string',
-	count: 'number>0',
-	'tags?': 'string[]'
-})
+  hello: "string",
+  count: "number>0",
+  "tags?": "string[]",
+});
 
 new Elysia()
-	.post('/', (c) => c.body, { body: arktypeSchema })
-	.listen(3000)
+  .post("/", (c) => c.body, { body: arktypeSchema })
+  .listen(3000);

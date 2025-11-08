@@ -1,5 +1,5 @@
-import { Elysia } from 'elysia'
+import { Elysia } from "elysia";
 
 new Elysia()
-	.post('/', (c) => c.body, { parse: 'json' })
-	.listen(3000)
+  .post("/", (c) => c.body, { parse: "json" })
+  .listen(3000);
