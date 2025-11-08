@@ -616,21 +616,25 @@ Benchmark results for HTTP frameworks with 10 REST API endpoints per app instanc
 
 ### Results (req/s)
 
-| Runtime | Framework |`;
+| Runtime | Framework | Avg |`;
 
   // Add numbered column headers
   endpointNames.forEach((name, i) => {
     md += ` ${numberSymbols[i].padEnd(5)} |`;
   });
-  md += ` Avg |`;
 
-  md += `\n|---------|-----------|`;
+  md += `\n|---------|-----------|-----:|`;
   endpointNames.forEach(() => (md += `------:|`));
-  md += `-----:|\n`;
+  md += `\n`;
 
   // Add data rows
   benchmarks.forEach((b) => {
-    md += `| ${b.runtime.padEnd(7)} | ${b.displayName.padEnd(9)} |`;
+    md += `| ${b.runtime.padEnd(7)} | ${b.displayName.padEnd(9)} | ${
+      b.average
+        .toFixed(0)
+        .padStart(9)
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    } |`;
 
     endpointNames.forEach((name) => {
       const val = b.endpoints[name]?.median;
@@ -646,12 +650,7 @@ Benchmark results for HTTP frameworks with 10 REST API endpoints per app instanc
       }
     });
 
-    md += ` ${
-      b.average
-        .toFixed(0)
-        .padStart(9)
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    } |\n`;
+    md += `\n`;
   });
 
   md += `

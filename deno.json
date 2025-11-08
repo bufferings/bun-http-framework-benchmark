@@ -3,5 +3,8 @@
   "compilerOptions": {
     "lib": ["deno.window"],
     "strict": true
+  },
+  "fmt": {
+    "exclude": ["docs/", "**/*.md"]
   }
 }
