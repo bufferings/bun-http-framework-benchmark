@@ -1,0 +1,522 @@
+{
+  "meta": {
+    "timestamp": "2025-11-08T03:06:51.423Z",
+    "benchmark": {
+      "tool": "oha",
+      "duration": 5,
+      "connections": 128,
+      "runs": 1
+    },
+    "environments": {
+      "load": {
+        "platform": "GCP (2-VM)",
+        "os": "Debian GNU/Linux 12 (bookworm)",
+        "cpu": "Intel(R) Xeon(R) CPU @ 3.10GHz (4 cores)",
+        "memory": "15GB"
+      },
+      "target": {
+        "platform": "GCP (2-VM)",
+        "os": "Debian GNU/Linux 12 (bookworm)",
+        "cpu": "Intel(R) Xeon(R) CPU @ 2.80GHz (2 cores)",
+        "memory": "7GB",
+        "runtimes": {
+          "bun": "1.3.1",
+          "node": "22.21.0",
+          "deno": "2.5.4"
+        }
+      }
+    }
+  },
+  "benchmarks": [
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        37229.6231
+      ],
+      "median": 37229.6231
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        101724.7663
+      ],
+      "median": 101724.7663
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        50909.3418
+      ],
+      "median": 50909.3418
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        27513.637
+      ],
+      "median": 27513.637
+    },
+    {
+      "endpoint": "validate-elysia-t",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        26206.7798
+      ],
+      "median": 26206.7798
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        27075.8073
+      ],
+      "median": 27075.8073
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "elysia",
+      "displayName": "elysia@1.4.13",
+      "results": [
+        30313.2792
+      ],
+      "median": 30313.2792
+    },
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        31587.3871
+      ],
+      "median": 31587.3871
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        49469.9005
+      ],
+      "median": 49469.9005
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        34425.1245
+      ],
+      "median": 34425.1245
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        22963.7049
+      ],
+      "median": 22963.7049
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        22919.6635
+      ],
+      "median": 22919.6635
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        22869.9927
+      ],
+      "median": 22869.9927
+    },
+    {
+      "endpoint": "body",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        34678.7123
+      ],
+      "median": 34678.7123
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        47484.8341
+      ],
+      "median": 47484.8341
+    },
+    {
+      "endpoint": "query",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        37593.0013
+      ],
+      "median": 37593.0013
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        20520.3257
+      ],
+      "median": 20520.3257
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        20465.6133
+      ],
+      "median": 20465.6133
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "bun",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        19861.7802
+      ],
+      "median": 19861.7802
+    },
+    {
+      "endpoint": "body",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        29791.1489
+      ],
+      "median": 29791.1489
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        63450.6814
+      ],
+      "median": 63450.6814
+    },
+    {
+      "endpoint": "query",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        40589.6885
+      ],
+      "median": 40589.6885
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        25358.1029
+      ],
+      "median": 25358.1029
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        24714.6595
+      ],
+      "median": 24714.6595
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "deno",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        25025.1897
+      ],
+      "median": 25025.1897
+    },
+    {
+      "endpoint": "body",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        36654.3211
+      ],
+      "median": 36654.3211
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        56907.9821
+      ],
+      "median": 56907.9821
+    },
+    {
+      "endpoint": "query",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        44923.3843
+      ],
+      "median": 44923.3843
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        25439.549
+      ],
+      "median": 25439.549
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        23339.9091
+      ],
+      "median": 23339.9091
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "deno",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        26357.1774
+      ],
+      "median": 26357.1774
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        4314.598
+      ],
+      "median": 4314.598
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        6321.763
+      ],
+      "median": 6321.763
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "express",
+      "displayName": "express@5.1.0",
+      "results": [
+        6014.1042
+      ],
+      "median": 6014.1042
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        17780.5682
+      ],
+      "median": 17780.5682
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        26552.6601
+      ],
+      "median": 26552.6601
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "fastify",
+      "displayName": "fastify@5.3.2",
+      "results": [
+        24859.3852
+      ],
+      "median": 24859.3852
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        8641.5828
+      ],
+      "median": 8641.5828
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        23169.9644
+      ],
+      "median": 23169.9644
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        20607.9709
+      ],
+      "median": 20607.9709
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7669.6663
+      ],
+      "median": 7669.6663
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7904.7778
+      ],
+      "median": 7904.7778
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "node",
+      "framework": "hono",
+      "displayName": "hono@4.10.2",
+      "results": [
+        7690.7076
+      ],
+      "median": 7690.7076
+    },
+    {
+      "endpoint": "body",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        8949.6265
+      ],
+      "median": 8949.6265
+    },
+    {
+      "endpoint": "ping",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        21124.3024
+      ],
+      "median": 21124.3024
+    },
+    {
+      "endpoint": "query",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        19787.0201
+      ],
+      "median": 19787.0201
+    },
+    {
+      "endpoint": "validate-arktype",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7362.1946
+      ],
+      "median": 7362.1946
+    },
+    {
+      "endpoint": "validate-valibot",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7568.6585
+      ],
+      "median": 7568.6585
+    },
+    {
+      "endpoint": "validate-zod",
+      "runtime": "node",
+      "framework": "kori",
+      "displayName": "kori@0.3.4",
+      "results": [
+        7323.393
+      ],
+      "median": 7323.393
+    }
+  ]
+}
