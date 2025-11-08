@@ -1,40 +1,40 @@
 ## Multi-Endpoint Benchmark Results
 
-Benchmark results for HTTP frameworks with 10 REST API endpoints.
+Benchmark results for HTTP frameworks with 10 REST API endpoints per app instance (all validation using Zod).
 
 ### Endpoints
 
-| # | Method | Path           | Validation              |
-| - | ------ | -------------- | ----------------------- |
-| ① | GET    | /api/users/:id | UUID param              |
-| ② | GET    | /api/users     |                         |
-| ③ | POST   | /api/users     | Body                    |
-| ④ | PUT    | /api/users/:id | UUID param + body       |
-| ⑤ | DELETE | /api/users/:id | UUID param              |
-| ⑥ | GET    | /api/posts/:id | Numeric ID param        |
-| ⑦ | GET    | /api/posts     |                         |
-| ⑧ | POST   | /api/posts     | Body                    |
-| ⑨ | PUT    | /api/posts/:id | Numeric ID param + body |
-| ⑩ | POST   | /api/comments  | Body                    |
+| # | Method | Path | Validation |
+|---|--------|------|------------|
+| ① | GET    | /api/users/:id            | UUID param |
+| ② | GET    | /api/users                |  |
+| ③ | POST   | /api/users                | Body |
+| ④ | PUT    | /api/users/:id            | UUID param + body |
+| ⑤ | DELETE | /api/users/:id            | UUID param |
+| ⑥ | GET    | /api/posts/:id            | Numeric ID param |
+| ⑦ | GET    | /api/posts                |  |
+| ⑧ | POST   | /api/posts                | Body |
+| ⑨ | PUT    | /api/posts/:id            | Numeric ID param + body |
+| ⑩ | POST   | /api/comments             | Body |
+
 
 ### Results (req/s)
 
-| Runtime | Framework     |      ① |      ② |      ③ |      ④ |      ⑤ |      ⑥ |      ⑦ |      ⑧ |      ⑨ |      ⑩ |    Avg |
-| ------- | ------------- | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: | -----: |
-| bun     | elysia@1.4.13 | 58,970 | 43,364 | 38,163 | 27,909 | 67,746 | 64,440 | 49,217 | 35,680 | 27,410 | 38,678 | 45,158 |
-| deno    | kori@0.3.4    | 28,304 | 35,852 | 27,194 | 20,377 | 38,001 | 39,641 | 38,290 | 28,160 | 20,526 | 26,362 | 30,271 |
-| deno    | hono@4.10.2   | 26,325 | 36,200 | 28,035 | 22,443 | 36,303 | 39,216 | 35,988 | 26,913 | 21,949 | 28,823 | 30,219 |
-| bun     | hono@4.10.2   | 31,098 | 30,653 | 26,368 | 20,511 | 34,655 | 33,050 | 32,463 | 24,713 | 22,029 | 26,770 | 28,231 |
-| bun     | kori@0.3.4    | 33,279 | 30,869 | 22,918 | 20,302 | 32,289 | 31,762 | 29,365 | 22,654 | 20,220 | 25,113 | 26,877 |
-| node    | fastify@5.3.2 | 16,745 | 16,932 | 10,628 | 10,874 | 18,177 | 17,212 | 17,464 | 11,308 | 10,662 | 10,954 | 14,096 |
-| node    | hono@4.10.2   | 13,686 | 12,970 |  6,667 |  6,634 | 12,962 | 13,964 | 13,962 |  7,138 |  6,872 |  7,332 | 10,219 |
-| node    | kori@0.3.4    | 10,933 | 10,986 |  6,655 |  6,808 |  8,697 | 10,326 | 11,055 |  7,032 |  6,928 |  7,318 |  8,674 |
-| node    | express@5.1.0 |  5,833 |  5,694 |  5,008 |  4,969 |  6,053 |  6,106 |  6,086 |  5,008 |  5,049 |  5,154 |  5,496 |
+| Runtime | Framework | ①     | ②     | ③     | ④     | ⑤     | ⑥     | ⑦     | ⑧     | ⑨     | ⑩     | Avg |
+|---------|-----------|------:|------:|------:|------:|------:|------:|------:|------:|------:|------:|-----:|
+| bun     | elysia@1.4.13 |       62,633 |       47,579 |       34,846 |       33,400 |       64,428 |       66,137 |       50,108 |       35,360 |       29,034 |       40,264 |     46,379 |
+| deno    | kori@0.3.4 |       31,082 |       40,026 |       28,611 |       21,333 |       38,008 |       43,086 |       42,976 |       30,946 |       23,170 |       30,675 |     32,991 |
+| deno    | hono@4.10.2 |       27,910 |       37,023 |       29,748 |       22,806 |       40,044 |       38,668 |       38,654 |       29,920 |       22,694 |       29,916 |     31,738 |
+| bun     | hono@4.10.2 |       33,956 |       32,423 |       23,003 |       21,644 |       31,790 |       28,741 |       33,093 |       28,133 |       23,197 |       28,293 |     28,427 |
+| bun     | kori@0.3.4 |       31,337 |       30,931 |       22,802 |       21,020 |       32,061 |       34,041 |       31,922 |       24,161 |       20,388 |       24,789 |     27,345 |
+| node    | fastify@5.3.2 |       17,183 |       14,476 |       11,107 |       10,763 |       17,714 |       18,484 |       17,069 |       11,410 |       11,362 |       11,821 |     14,139 |
+| node    | hono@4.10.2 |       15,170 |       14,033 |        6,944 |        6,972 |       14,503 |       14,986 |       14,303 |        7,453 |        7,058 |        7,571 |     10,899 |
+| node    | kori@0.3.4 |       10,911 |       11,264 |        6,941 |        7,032 |        9,638 |       11,574 |       11,636 |        7,591 |        6,990 |        7,842 |      9,142 |
+
 
 ### Relative Performance (%)
 
-Overall comparison normalized to percentages. The fastest framework for each
-endpoint = 100%.
+Overall comparison normalized to percentages. The fastest framework for each endpoint = 100%.
 
 ![Relative Performance](./chart-relative.svg)
 
@@ -46,18 +46,18 @@ Shows the actual requests per second for each framework across all endpoints.
 
 ### Benchmark Environment
 
-| Item     | Value                                |
-| -------- | ------------------------------------ |
-| Date     | 2025-11-07T17:34:57.835Z             |
-| Tool     | oha                                  |
+| Item | Value |
+|---|---|
+| Date | 2025-11-08T02:08:07.690Z |
+| Tool | oha |
 | Settings | 5s duration, 128 connections, 1 runs |
-| Runtimes | Bun 1.3.1, Node 22.21.1, Deno 2.5.6  |
+| Runtimes | Bun 1.3.1, Node 22.21.1, Deno 2.5.6 |
 
 Machine:
 
-| Item     | Value                                     |
-| -------- | ----------------------------------------- |
-| Platform | linux                                     |
-| OS       | linux 6.11.0-1018-azure                   |
-| CPU      | AMD EPYC 7763 64-Core Processor (4 cores) |
-| Memory   | 15.6GB                                    |
+| Item | Value |
+|---|---|
+| Platform | linux |
+| OS | linux 6.11.0-1018-azure |
+| CPU | AMD EPYC 7763 64-Core Processor (4 cores) |
+| Memory | 15.6GB |
