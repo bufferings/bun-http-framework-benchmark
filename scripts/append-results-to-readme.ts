@@ -36,22 +36,23 @@ const endMarker = benchType === "single"
 const startIndex = readme.indexOf(startMarker);
 const endIndex = readme.indexOf(endMarker);
 
-if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-  // Remove the section between markers (including both markers)
-  const before = readme.substring(0, startIndex).trimEnd();
-  const after = readme.substring(endIndex + endMarker.length).trimStart();
-  readme = before + (after ? "\n\n" + after : "");
-}
-
-// Append new results
-const newSection = `
-
-${startMarker}
+const newSection = `${startMarker}
 
 ${results}
 
-${endMarker}
-`;
+${endMarker}`;
 
-writeFileSync(readmePath, readme + newSection);
+let finalReadme: string;
+
+if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+  // Replace the section in place to maintain order
+  const before = readme.substring(0, startIndex);
+  const after = readme.substring(endIndex + endMarker.length);
+  finalReadme = before + newSection + after;
+} else {
+  // Section doesn't exist, append to end
+  finalReadme = readme + "\n\n" + newSection + "\n";
+}
+
+writeFileSync(readmePath, finalReadme);
 console.log(`✅ Results appended to README`);
