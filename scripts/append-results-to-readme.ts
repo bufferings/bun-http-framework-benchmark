@@ -36,54 +36,22 @@ const endMarker = benchType === "single"
 const startIndex = readme.indexOf(startMarker);
 const endIndex = readme.indexOf(endMarker);
 
-if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
-  // Remove the section between markers (including both markers)
-  const before = readme.substring(0, startIndex).trimEnd();
-  const after = readme.substring(endIndex + endMarker.length).trimStart();
-  readme = before + (after ? "\n\n" + after : "");
-}
-
-// Prepare new section
-const newSection = `
-
-${startMarker}
+const newSection = `${startMarker}
 
 ${results}
 
-${endMarker}
-`;
+${endMarker}`;
 
-// Insert new results at the appropriate position to maintain order (single before multi)
 let finalReadme: string;
 
-if (benchType === "single") {
-  // For single results: insert before multi section if it exists, otherwise append to end
-  const multiStartMarker = "<!-- START BENCHMARK MULTI RESULTS -->";
-  const multiStartIndex = readme.indexOf(multiStartMarker);
-
-  if (multiStartIndex !== -1) {
-    // Insert before multi section
-    const before = readme.substring(0, multiStartIndex).trimEnd();
-    const after = readme.substring(multiStartIndex);
-    finalReadme = before + newSection + "\n\n" + after;
-  } else {
-    // Multi section doesn't exist, append to end
-    finalReadme = readme + newSection;
-  }
+if (startIndex !== -1 && endIndex !== -1 && endIndex > startIndex) {
+  // Replace the section in place to maintain order
+  const before = readme.substring(0, startIndex);
+  const after = readme.substring(endIndex + endMarker.length);
+  finalReadme = before + newSection + after;
 } else {
-  // For multi results: insert after single section if it exists, otherwise append to end
-  const singleEndMarker = "<!-- END BENCHMARK SINGLE RESULTS -->";
-  const singleEndIndex = readme.indexOf(singleEndMarker);
-
-  if (singleEndIndex !== -1) {
-    // Insert after single section
-    const before = readme.substring(0, singleEndIndex + singleEndMarker.length);
-    const after = readme.substring(singleEndIndex + singleEndMarker.length).trimStart();
-    finalReadme = before + newSection + (after ? "\n\n" + after : "");
-  } else {
-    // Single section doesn't exist, append to end
-    finalReadme = readme + newSection;
-  }
+  // Section doesn't exist, append to end
+  finalReadme = readme + "\n\n" + newSection + "\n";
 }
 
 writeFileSync(readmePath, finalReadme);
