@@ -3,4 +3,5 @@ pre-commit:
     fmt:
       glob: "*.{ts,js,mjs,tsx,jsx}"
       run: deno fmt {staged_files}
+      stage_fixed: true
 
