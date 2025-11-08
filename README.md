@@ -32,23 +32,23 @@ bun run scripts/report.ts results/single.json docs/bench-single
 
 <!-- START BENCHMARK SINGLE RESULTS -->
 
-## Single Process Benchmark Results
+## Single-Endpoint Benchmark Results
 
-Benchmark results for HTTP frameworks running in a single process (1 endpoint per app instance).
+Benchmark results for HTTP frameworks with 1 endpoint per app instance.
 
 ### Results (req/s)
 
 | Runtime | Framework      | ping      | query     | body      | zod       | valibot   | arktype   | elysia-t  |
 |---------|----------------|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|
-| bun     | elysia@1.4.13  |     73,062 |     56,444 |     46,801 |     32,317 |     33,334 |     32,639 |     30,854 |
-| deno    | hono@4.10.2    |     66,161 |     46,016 |     33,481 |     25,819 |     27,020 |     29,029 |         - |
-| deno    | kori@0.3.4     |     62,504 |     54,692 |     34,278 |     26,070 |     26,680 |     26,607 |         - |
-| bun     | hono@4.10.2    |     58,490 |     43,244 |     36,095 |     26,652 |     26,727 |     26,890 |         - |
-| bun     | kori@0.3.4     |     58,176 |     48,301 |     41,673 |     23,316 |     23,054 |     23,160 |         - |
-| node    | fastify@5.3.2  |     30,417 |     27,962 |     20,000 |         - |         - |         - |         - |
-| node    | hono@4.10.2    |     25,793 |     22,144 |      8,971 |      8,240 |      8,133 |      8,137 |         - |
-| node    | kori@0.3.4     |     25,544 |     21,891 |      9,455 |      7,758 |      7,795 |      7,620 |         - |
-| node    | express@5.1.0  |      6,658 |      6,194 |      4,530 |         - |         - |         - |         - |
+| bun     | elysia@1.4.13  |     70,289 |     54,730 |     47,443 |     31,835 |     31,794 |     31,575 |     29,951 |
+| deno    | hono@4.10.2    |     65,759 |     44,568 |     32,455 |     25,266 |     27,627 |     28,066 |         - |
+| deno    | kori@0.3.4     |     60,905 |     50,725 |     34,590 |     25,011 |     25,574 |     25,759 |         - |
+| bun     | hono@4.10.2    |     59,079 |     42,959 |     35,135 |     25,848 |     26,124 |     25,941 |         - |
+| bun     | kori@0.3.4     |     57,687 |     50,160 |     41,516 |     22,501 |     22,540 |     22,254 |         - |
+| node    | fastify@5.3.2  |     29,299 |     27,454 |     19,738 |         - |         - |         - |         - |
+| node    | hono@4.10.2    |     26,625 |     21,614 |      9,017 |      8,280 |      8,302 |      8,041 |         - |
+| node    | kori@0.3.4     |     23,881 |     20,945 |      9,407 |      7,875 |      8,125 |      7,685 |         - |
+| node    | express@5.1.0  |      6,599 |      6,366 |      4,467 |         - |         - |         - |         - |
 
 ### Relative Performance (%)
 
@@ -66,9 +66,9 @@ Shows the actual requests per second for each framework across all test cases.
 
 | Item | Value |
 |---|---|
-| Date | 2025-11-08T06:10:43.604Z |
+| Date | 2025-11-08T09:01:51.466Z |
 | Tool | oha |
-| Settings | 30s duration, 300 connections, 1 run |
+| Settings | 5s duration, 500 connections, 1 run |
 | Runtimes | Bun 1.3.1, Node 22.21.0, Deno 2.5.4 |
 
 Load Machine:
