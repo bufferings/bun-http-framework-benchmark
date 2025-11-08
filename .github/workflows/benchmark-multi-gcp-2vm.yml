@@ -94,6 +94,11 @@ jobs:
           chmod +x oha-linux-amd64
           sudo mv oha-linux-amd64 /usr/local/bin/oha
 
+      - name: Clear previous results
+        run: |
+          rm -rf results/multi-2vm.json
+          rm -rf docs/bench-multi-2vm/
+
       - name: Run benchmark
         run: |
           TIME="${{ inputs.time || '30' }}"
