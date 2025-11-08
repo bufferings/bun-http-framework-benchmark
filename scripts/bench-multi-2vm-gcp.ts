@@ -251,50 +251,42 @@ const spawnOnTarget = async (target: string, targetIp: string) => {
 		}
 	}
 
-	const cmd = [...runtimeCommand[runtime].split(' '), file].join(' ')
+	const cmd = `screen -dmS benchmark bash -c 'cd ~/bun-http-framework-benchmark && ${runtimeCommand[runtime]} ${file} > /dev/null 2>&1'`
 
-	// Start server on target VM
-	const startCmd = `cd ~/bun-http-framework-benchmark && NODE_ENV=production ${cmd} > /tmp/server.log 2>&1 & echo $!`
-	const pidOutput = await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${startCmd}`.text()
-	const pid = pidOutput.trim()
-
-	console.log(`Server started on target VM with PID: ${pid}`)
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command=${cmd}`.quiet()
 
 	// Wait for server to be ready
-	const maxRetries = 60
-	let retries = 0
-	while (retries < maxRetries) {
-		try {
-			await fetch(`http://${targetIp}:3000/api/users?page=1&limit=10`)
-			break
-		} catch {
-			retries++
-			if (retries >= maxRetries) {
-				throw new Error(`Server failed to start after ${maxRetries} attempts`)
-			}
-			await sleep(0.2)
-		}
-	}
+	await sleep(3)
 
 	return async () => {
 		try {
-			await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="kill ${pid} 2>/dev/null || true"`.text()
+			await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="screen -S benchmark -X quit"`.quiet()
 		} catch {
-			// Ignore errors
+			// Ignore if no session exists
 		}
-		await sleep(0.5)
-
 		try {
-			await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f '${cmd}' || true"`.text()
+			await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="pkill -f 'bun run\\|node\\|deno'"`.quiet()
 		} catch {
-			// Ignore errors
+			// Ignore if no processes found
 		}
+		await sleep(1)
 	}
 }
 
 if (!existsSync('results')) mkdirSync('results')
 
 const main = async () => {
+	// Sync repository to target VM
+	console.log(`Syncing repository to ${targetVmName}...`)
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="rm -rf ~/bun-http-framework-benchmark && mkdir -p ~/bun-http-framework-benchmark"`.quiet()
+	await Bun.$`gcloud compute scp --recurse --internal-ip --zone=${gcpZone} --project=${gcpProjectId} ./src ./package.json ./bun.lockb ./scripts/data ${targetVmName}:~/bun-http-framework-benchmark/`.quiet()
+
+	console.log('Installing dependencies on target VM...')
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install"`.quiet()
+
+	console.log('Setting ulimit on target VM...')
+	await Bun.$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="ulimit -n 65535"`.quiet()
+
 	console.log('\nGetting target VM IP...')
 	const targetIp = await getTargetIp()
 	console.log(`Target VM IP: ${targetIp}`)
