@@ -78,13 +78,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install git
-        run: |
-          if ! command -v git &> /dev/null; then
-              sudo apt-get update
-              sudo apt-get install -y git
-          fi
-
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:

@@ -1,0 +1,6 @@
+pre-commit:
+  commands:
+    fmt:
+      glob: "*.{ts,js,mjs,tsx,jsx}"
+      run: deno fmt {staged_files}
+

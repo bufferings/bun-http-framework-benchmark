@@ -9,20 +9,6 @@ Bun, Node.js, and Deno runtimes.
 
 Kori uses Hono's router internally, aiming to stay within ~10% overhead.
 
-## Benchmarks
-
-### Basic Benchmarks
-
-- **Ping** - `GET /` returns "Hi" (text/plain)
-- **Query** - `GET /id/:id?name=bun` extracts params and query (returns "1 bun")
-- **Body** - `POST /json` parses and mirrors JSON body
-
-### Validation Benchmarks
-
-- **Zod** - Request body validation using Zod schema
-- **Valibot** - Request body validation using Valibot schema
-- **ArkType** - Request body validation using ArkType schema
-
 ## Prerequisites
 
 - [oha](https://github.com/hatoo/oha) - HTTP benchmarking tool
