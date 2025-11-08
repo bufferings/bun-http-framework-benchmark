@@ -93,9 +93,16 @@ jobs:
 
       - name: Install oha
         run: |
-          wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
-          chmod +x oha-linux-amd64
-          sudo mv oha-linux-amd64 /usr/local/bin/oha
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
+            wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-arm64
+            chmod +x oha-linux-arm64
+            sudo mv oha-linux-arm64 /usr/local/bin/oha
+          else
+            wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64
+            chmod +x oha-linux-amd64
+            sudo mv oha-linux-amd64 /usr/local/bin/oha
+          fi
 
       - name: Clear previous results
         run: |
