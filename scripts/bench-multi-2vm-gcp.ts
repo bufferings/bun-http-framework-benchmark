@@ -37,7 +37,7 @@ console.log(
 );
 
 // Get environment variables for GCP
-const targetVmName = process.env.TARGET_VM_NAME || "bench-vm-target";
+const targetVmName = process.env.TARGET_VM_NAME || "bench-vm-target-multi";
 const gcpProjectId = process.env.GCP_PROJECT_ID;
 const gcpZone = process.env.GCP_ZONE;
 
@@ -531,7 +531,7 @@ const main = async () => {
   // Collect environment info
   console.log("\nCollecting environment information...");
 
-  const loadVmName = process.env.LOAD_VM_NAME || "bench-vm-load";
+  const loadVmName = process.env.LOAD_VM_NAME || "bench-vm-load-multi";
 
   const [
     loadPlatform,

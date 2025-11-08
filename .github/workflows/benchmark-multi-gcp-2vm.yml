@@ -28,10 +28,10 @@ permissions:
   contents: read
 
 env:
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCP_ZONE: ${{ secrets.GCP_ZONE }}
-  TARGET_VM_NAME: bench-vm-target
-  LOAD_VM_NAME: bench-vm-load
+    GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+    GCP_ZONE: ${{ secrets.GCP_ZONE }}
+    TARGET_VM_NAME: bench-vm-target-multi
+    LOAD_VM_NAME: bench-vm-load-multi
 
 jobs:
   start-vms:
@@ -69,7 +69,7 @@ jobs:
   benchmark:
     name: Run Multi-Endpoint Benchmarks
     needs: start-vms
-    runs-on: [self-hosted, bench-vm-load]
+        runs-on: [self-hosted, bench-vm-load-multi]
     timeout-minutes: 180
     permissions:
       id-token: write
