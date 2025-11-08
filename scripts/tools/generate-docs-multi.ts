@@ -585,32 +585,17 @@ Benchmark results for HTTP frameworks with 10 REST API endpoints per app instanc
 
 | # | Method | Path | Validation |
 |---|--------|------|------------|
+| ① | GET    | /api/users/:id            | UUID param |
+| ② | GET    | /api/users                | Query params (page, limit) |
+| ③ | POST   | /api/users                | Body |
+| ④ | PUT    | /api/users/:id            | UUID param + body |
+| ⑤ | DELETE | /api/users/:id            | UUID param |
+| ⑥ | GET    | /api/posts/:id            | Numeric ID param |
+| ⑦ | GET    | /api/posts                | Query params (userId, page) |
+| ⑧ | POST   | /api/posts                | Body |
+| ⑨ | PUT    | /api/posts/:id            | Numeric ID param + body |
+| ⑩ | POST   | /api/comments             | Body |
 `;
-
-  // Add endpoint definition table
-  endpointNames.forEach((name, i) => {
-    const parts = name.split(" ");
-    const method = parts[0];
-    const path = parts[1] || name;
-    // Extract validation info from endpoint name or infer from path
-    let validation = "";
-    if (path.includes("/:id") && path.includes("users")) {
-      validation = "UUID param";
-      if (method !== "GET" && method !== "DELETE") validation += " + body";
-    } else if (path.includes("/:id") && path.includes("posts")) {
-      validation = "Numeric ID param";
-      if (method === "PUT") validation += " + body";
-    } else if (path.includes("?")) {
-      validation = "Query params";
-    } else if (method === "POST") {
-      validation = "Body";
-    }
-    md += `| ${numberSymbols[i]} | ${method.padEnd(6)} | ${
-      path.padEnd(
-        25,
-      )
-    } | ${validation} |\n`;
-  });
 
   md += `
 

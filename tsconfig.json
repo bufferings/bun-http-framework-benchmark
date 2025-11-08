@@ -6,9 +6,7 @@
     "target": "esnext",
     "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
-
-    // so that if your project isn't using TypeScript, it still has autocomplete
-    "allowJs": true,
+    "allowJs": false,
     "experimentalDecorators": true
   }
 }
