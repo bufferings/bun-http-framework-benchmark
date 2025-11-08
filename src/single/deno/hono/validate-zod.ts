@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { RegExpRouter } from "hono/router/reg-exp-router";
 import { sValidator } from "@hono/standard-validator";
 import { z } from "zod";
 
@@ -9,7 +8,7 @@ const zodSchema = z.object({
   tags: z.array(z.string()).optional(),
 });
 
-const app = new Hono({ router: new RegExpRouter() });
+const app = new Hono();
 app.post(
   "/",
   sValidator("json", zodSchema),

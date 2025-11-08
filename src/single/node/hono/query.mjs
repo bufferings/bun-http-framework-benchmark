@@ -1,8 +1,7 @@
 import { Hono } from "hono";
-import { RegExpRouter } from "hono/router/reg-exp-router";
 import { serve } from "@hono/node-server";
 
-const app = new Hono({ router: new RegExpRouter() });
+const app = new Hono();
 
 app.get("/:id", (c) => {
   c.header("x-powered-by", "benchmark");

@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
-import { RegExpRouter } from "hono/router/reg-exp-router";
 import { sValidator } from "@hono/standard-validator";
 import { z } from "zod";
 
@@ -41,7 +40,7 @@ const commentBodySchema = z.object({
   author: z.string().min(1),
 });
 
-const app = new Hono({ router: new RegExpRouter() });
+const app = new Hono();
 
 // 1. GET /api/users/:id
 app.get("/api/users/:id", sValidator("param", uuidSchema), (c) => {

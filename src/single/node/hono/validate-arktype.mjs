@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { RegExpRouter } from "hono/router/reg-exp-router";
 import { serve } from "@hono/node-server";
 import { sValidator } from "@hono/standard-validator";
 import { type } from "arktype";
@@ -10,7 +9,7 @@ const arktypeSchema = type({
   "tags?": "string[]",
 });
 
-const app = new Hono({ router: new RegExpRouter() });
+const app = new Hono();
 
 app.post(
   "/",
