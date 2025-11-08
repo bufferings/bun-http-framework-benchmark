@@ -88,9 +88,6 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Install Node.js dependencies
-        run: npm install
-
       - name: Install oha
         run: |
           wget https://github.com/hatoo/oha/releases/download/v1.11.0/oha-linux-amd64

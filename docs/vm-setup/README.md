@@ -21,6 +21,8 @@ sudo apt update && sudo apt install -y curl wget unzip jq git
 2. Install Bun:
 ```bash
 curl -fsSL https://bun.sh/install | bash
+# Create symlink for GitHub Actions runner
+sudo ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 ```
 
 3. Setup GitHub Actions Runner:
@@ -51,11 +53,15 @@ sudo apt install -y nodejs
 3. Install Bun:
 ```bash
 curl -fsSL https://bun.sh/install | bash
+# Create symlink for remote execution
+sudo ln -s $HOME/.bun/bin/bun /usr/local/bin/bun
 ```
 
 4. Install Deno:
 ```bash
 curl -fsSL https://deno.land/install.sh | sh
+# Create symlink for remote execution
+sudo ln -s $HOME/.deno/bin/deno /usr/local/bin/deno
 ```
 
 **Note:** GitHub Actions runner is NOT needed on Target VM.
