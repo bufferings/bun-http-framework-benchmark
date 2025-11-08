@@ -613,9 +613,9 @@ const generateREADME = (
     }
   }
 
-  let md = `## Single Process Benchmark Results
+  let md = `## Single-Endpoint Benchmark Results
 
-Benchmark results for HTTP frameworks running in a single process (1 endpoint per app instance).
+Benchmark results for HTTP frameworks with 1 endpoint per app instance.
 
 ### Results (req/s)
 
