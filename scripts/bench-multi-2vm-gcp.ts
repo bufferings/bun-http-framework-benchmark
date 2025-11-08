@@ -26,7 +26,7 @@ const getFlag = (name: string, defaultValue: number): number => {
 };
 
 const time = getFlag("time", 30);
-const connections = getFlag("connections", 128);
+const connections = getFlag("connections", 300);
 const runs = getFlag("runs", 1);
 
 if (targetFrameworks.length > 0) {
@@ -386,7 +386,7 @@ const main = async () => {
 
   console.log("Installing dependencies on target VM...");
   await Bun
-    .$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install"`
+    .$`gcloud compute ssh ${targetVmName} --internal-ip --zone=${gcpZone} --project=${gcpProjectId} --command="cd ~/bun-http-framework-benchmark && bun install --ignore-scripts"`
     .quiet();
 
   console.log("Setting ulimit on target VM...");

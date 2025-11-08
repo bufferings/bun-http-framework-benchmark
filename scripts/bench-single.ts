@@ -26,7 +26,7 @@ const getFlag = (name: string, defaultValue: number): number => {
 };
 
 const time = getFlag("time", 10);
-const connections = getFlag("connections", 200);
+const connections = getFlag("connections", 300);
 const runs = getFlag("runs", 3);
 
 if (targetEndpoints.length > 0) {

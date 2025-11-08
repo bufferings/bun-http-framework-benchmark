@@ -11,7 +11,7 @@ on:
       connections:
         description: "Number of concurrent connections"
         required: false
-        default: "128"
+        default: "300"
         type: string
       runs:
         description: "Number of runs per benchmark (median)"
