@@ -3,7 +3,7 @@ import { startNodejsServer } from "@korix/nodejs-server";
 import {
   enableStdRequestValidation,
   stdRequestSchema,
-} from "@korix/standard-schema-adapter";
+} from "@korix/std-schema-adapter";
 import * as v from "valibot";
 
 const valibotSchema = v.object({

@@ -3,7 +3,7 @@ import { startNodejsServer } from "@korix/nodejs-server";
 import {
   enableStdRequestValidation,
   stdRequestSchema,
-} from "@korix/standard-schema-adapter";
+} from "@korix/std-schema-adapter";
 import { type } from "arktype";
 
 const arktypeSchema = type({

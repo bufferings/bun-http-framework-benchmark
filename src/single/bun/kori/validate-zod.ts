@@ -2,7 +2,7 @@ import { createKori } from "@korix/kori";
 import {
   enableStdRequestValidation,
   stdRequestSchema,
-} from "@korix/standard-schema-adapter";
+} from "@korix/std-schema-adapter";
 import { z } from "zod";
 
 const zodSchema = z.object({
