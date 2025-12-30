@@ -3,9 +3,9 @@
   "specifiers": {
     "npm:@hono/node-server@^1.19.7": "1.19.7_hono@4.11.3",
     "npm:@hono/standard-validator@~0.2.1": "0.2.1_@standard-schema+spec@1.0.0_hono@4.11.3",
-    "npm:@korix/kori@~0.3.6": "0.3.6",
-    "npm:@korix/nodejs-server@~0.3.6": "0.3.6_@korix+kori@0.3.6_hono@4.11.3",
-    "npm:@korix/std-schema-adapter@~0.3.6": "0.3.6_@korix+kori@0.3.6_@standard-schema+spec@1.0.0",
+    "npm:@korix/kori@0.4": "0.4.0",
+    "npm:@korix/nodejs-server@0.4": "0.4.0_@korix+kori@0.4.0_hono@4.11.3",
+    "npm:@korix/std-schema-adapter@0.4": "0.4.0_@korix+kori@0.4.0_@standard-schema+spec@1.1.0",
     "npm:@types/bun@^1.3.5": "1.3.5",
     "npm:@types/express@^5.0.6": "5.0.6",
     "npm:@types/kill-port@^2.0.3": "2.0.3",
@@ -77,43 +77,37 @@
         "yaml"
       ]
     },
-    "@hono/node-server@1.19.6_hono@4.11.3": {
-      "integrity": "sha512-Shz/KjlIeAhfiuE93NDKVdZ7HdBVLQAfdbaXEaoAVO3ic9ibRSLGIQGkcBbFyuLr+7/1D5ZCINM8B+6IvXeMtw==",
-      "dependencies": [
-        "hono@4.11.3"
-      ]
-    },
     "@hono/node-server@1.19.7_hono@4.11.3": {
       "integrity": "sha512-vUcD0uauS7EU2caukW8z5lJKtoGMokxNbJtBiwHgpqxEXokaHCBkQUmCHhjFB1VUTWdqj25QoMkMKzgjq+uhrw==",
       "dependencies": [
-        "hono@4.11.3"
+        "hono"
       ]
     },
     "@hono/standard-validator@0.2.1_@standard-schema+spec@1.0.0_hono@4.11.3": {
       "integrity": "sha512-uF1W7/iSWi0r5Mugj5ZzdlCVp/KeGatS6JYt+Eht9xKO0IDtdZbdaLApgjrzHINQQa+Wnxw2pcX6EfO+vgB+Wg==",
       "dependencies": [
-        "@standard-schema/spec",
-        "hono@4.11.3"
+        "@standard-schema/spec@1.0.0",
+        "hono"
       ]
     },
-    "@korix/kori@0.3.6": {
-      "integrity": "sha512-yww7wfMnngSfi5i8s2SaNd2nZXqArscLsIh53GA4ksTKPAFhj/IsG0UfRBVEJp6ylmmHsJu1SC+bCZLQk66/NA==",
+    "@korix/kori@0.4.0": {
+      "integrity": "sha512-01jHfVdd51IzrOnuDZ7rNRe/xN0AZCGNTwQWGOIvHJjo1K01jv5PNQdigBb3jBXCWHc4EvmZY7WAHboQegmkCQ==",
       "dependencies": [
-        "hono@4.9.8"
+        "hono"
       ]
     },
-    "@korix/nodejs-server@0.3.6_@korix+kori@0.3.6_hono@4.11.3": {
-      "integrity": "sha512-KtxXh1cJbicHtKANPzcyQ1ztIGmnK5WPdVsJuEUsTrpQ2Pg9byC2/N6VIgciRdq7MKQWrc9nCdrOtfplrWp7mw==",
+    "@korix/nodejs-server@0.4.0_@korix+kori@0.4.0_hono@4.11.3": {
+      "integrity": "sha512-rKTtwbC5HI0KwfzLZccHYMNe8C082e381OWyBBJ14mBpfhQQuTFVwtppGfRIqSZ1/yxaujM8WbPLDS4CLhbiNg==",
       "dependencies": [
-        "@hono/node-server@1.19.6_hono@4.11.3",
+        "@hono/node-server",
         "@korix/kori"
       ]
     },
-    "@korix/std-schema-adapter@0.3.6_@korix+kori@0.3.6_@standard-schema+spec@1.0.0": {
-      "integrity": "sha512-v8FX1fJ5RENkvRAuw6ifGA2oIhATk0Y1CkM/j1aG+6iBI1pjzW4h6LXRsRTkKc2Jq40hctiTsQZwCMmG2UOJew==",
+    "@korix/std-schema-adapter@0.4.0_@korix+kori@0.4.0_@standard-schema+spec@1.1.0": {
+      "integrity": "sha512-8JbYucGQ3uZD++Ql7MaGzYEJ294vHLVge1i2vpqr1fYI75XpbMZUzkz/FsN6ChqYr8s92inZow6yzQEmu3J/Ig==",
       "dependencies": [
         "@korix/kori",
-        "@standard-schema/spec"
+        "@standard-schema/spec@1.1.0"
       ]
     },
     "@pinojs/redact@0.4.0": {
@@ -124,6 +118,9 @@
     },
     "@standard-schema/spec@1.0.0": {
       "integrity": "sha512-m2bOd0f2RT9k8QJx1JN85cZYyH1RqFBdlwtkSlf4tBDYLCiiZnv1fIIwacK6cqwXavOydf0NPToMQgpKq+dVlA=="
+    },
+    "@standard-schema/spec@1.1.0": {
+      "integrity": "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="
     },
     "@tokenizer/inflate@0.4.1": {
       "integrity": "sha512-2mAv+8pkG6GIZiF1kNg1jAjh27IDxEPKwdGul3snfztFerfPGI1LjDezZp3i7BElXompqEtPmoPx6c2wgtWsOA==",
@@ -555,9 +552,6 @@
     },
     "hono@4.11.3": {
       "integrity": "sha512-PmQi306+M/ct/m5s66Hrg+adPnkD5jiO6IjA7WhWw0gSBSo1EcRegwuI1deZ+wd5pzCGynCcn2DprnE4/yEV4w=="
-    },
-    "hono@4.9.8": {
-      "integrity": "sha512-JW8Bb4RFWD9iOKxg5PbUarBYGM99IcxFl2FPBo2gSJO11jjUDqlP1Bmfyqt8Z/dGhIQ63PMA9LdcLefXyIasyg=="
     },
     "http-errors@2.0.1": {
       "integrity": "sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==",
@@ -1008,9 +1002,9 @@
       "dependencies": [
         "npm:@hono/node-server@^1.19.7",
         "npm:@hono/standard-validator@~0.2.1",
-        "npm:@korix/kori@~0.3.6",
-        "npm:@korix/nodejs-server@~0.3.6",
-        "npm:@korix/std-schema-adapter@~0.3.6",
+        "npm:@korix/kori@0.4",
+        "npm:@korix/nodejs-server@0.4",
+        "npm:@korix/std-schema-adapter@0.4",
         "npm:@types/bun@^1.3.5",
         "npm:@types/express@^5.0.6",
         "npm:@types/kill-port@^2.0.3",
